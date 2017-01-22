@@ -26,6 +26,11 @@ if [ ! -d "$EXTRA_ROOT" ]; then
 	exit 1
 fi
 
+# Make sure all submodules are checked out.
+pushd "$EXTRA_ROOT"
+	git submodule update --init --recursive
+popd
+
 if [ ! "$#" -eq 1 ]; then
 	echo "Usage: $0 https://releases.wikimedia.org/mediawiki/x.xx/mediawiki-x.xx.xx.tar.gz" >&2
 	exit 1
