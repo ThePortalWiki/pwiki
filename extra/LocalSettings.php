@@ -289,7 +289,7 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
 
   #require_once("$IP/extensions/CategoryTree/CategoryTree.php");
   
-  require_once("$IP/extensions/UserMerge/UserMerge.php");
+  wfLoadExtension( 'UserMerge' );
 
   require_once("$IP/extensions/WikiEditor/WikiEditor.php");
   $wgDefaultUserOptions['usebetatoolbar'] = 1;
