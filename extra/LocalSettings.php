@@ -359,7 +359,7 @@ $randomHash
           )
   );
 
-  require_once("$IP/extensions/CharInsert/CharInsert.php");
+  wfLoadExtension( 'CharInsert' );
 
   require_once("$IP/extensions/Interwiki/Interwiki.php");
   $wgGroupPermissions['*']['interwiki'] = false;
