@@ -52,3 +52,6 @@
 [submodule "extra/extensions/SecureHTML"]
 	path = extra/extensions/SecureHTML
 	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SecureHTML
+[submodule "extra/extensions/SpamBlacklist"]
+	path = extra/extensions/SpamBlacklist
+	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SpamBlacklist
