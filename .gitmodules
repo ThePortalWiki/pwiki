@@ -25,3 +25,6 @@
 [submodule "extra/extensions/ImageMap"]
 	path = extra/extensions/ImageMap
 	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ImageMap
+[submodule "extra/extensions/InputBox"]
+	path = extra/extensions/InputBox
+	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/InputBox
