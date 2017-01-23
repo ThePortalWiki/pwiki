@@ -46,3 +46,6 @@
 [submodule "extra/extensions/Poem"]
 	path = extra/extensions/Poem
 	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Poem
+[submodule "extra/extensions/Renameuser"]
+	path = extra/extensions/Renameuser
+	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Renameuser
