@@ -40,3 +40,6 @@
 [submodule "extra/extensions/Nuke"]
 	path = extra/extensions/Nuke
 	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Nuke
+[submodule "extra/extensions/ParserFunctions"]
+	path = extra/extensions/ParserFunctions
+	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ParserFunctions
