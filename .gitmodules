@@ -16,3 +16,6 @@
 [submodule "extra/extensions/ConfirmEdit"]
 	path = extra/extensions/ConfirmEdit
 	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ConfirmEdit
+[submodule "extra/extensions/Gadgets"]
+	path = extra/extensions/Gadgets
+	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Gadgets
