@@ -375,7 +375,9 @@ $randomHash
   if (function_exists('wfLoadExtension')) { wfLoadExtension('Secured_HTML'); } else { require_once( "$IP/extensions/Secured_HTML/Secured_HTML.php" ); }
   $wgGroupPermissions['coding']['coding'] = true;
 
-  if (function_exists('wfLoadExtension')) { wfLoadExtension('RevQuery'); } else { require_once( "$IP/extensions/RevQuery/RevQuery.php" ); }
+  # No patch exists for current MediaWiki; update please?
+  # https://github.com/ThePortalWiki/RevQuery
+  # if (function_exists('wfLoadExtension')) { wfLoadExtension('RevQuery'); } else { require_once( "$IP/extensions/RevQuery/RevQuery.php" ); }
 
   if (function_exists('wfLoadExtension')) { wfLoadExtension('SpamBlacklist'); } else { require_once( "$IP/extensions/SpamBlacklist/SpamBlacklist.php" ); }
   $wgSpamBlacklistFiles = array(

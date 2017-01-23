@@ -64,3 +64,6 @@
 [submodule "extra/extensions/RedditThumbnail"]
 	path = extra/extensions/RedditThumbnail
 	url = https://github.com/ThePortalWiki/RedditThumbnail
+[submodule "extra/extensions/RevQuery"]
+	path = extra/extensions/RevQuery
+	url = https://github.com/ThePortalWiki/RevQuery
