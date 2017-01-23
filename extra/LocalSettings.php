@@ -3,7 +3,7 @@
 # Redirect to .com if on .net
 if(isset($_SERVER['HTTP_HOST']) && substr_compare($_SERVER['HTTP_HOST'], '.net', -4, 4) === 0) {
 	header('HTTP/1.0 301 Moved Permanently');
-	header('Location: http://theportalwiki.com'.$_SERVER['REQUEST_URI']);
+	header('Location: https://theportalwiki.com'.$_SERVER['REQUEST_URI']);
 	die();
 }
 
@@ -26,7 +26,7 @@ if(isset($_SERVER['HTTP_HOST']) && substr_compare($_SERVER['HTTP_HOST'], '.net',
 # file, not there.
 #
 # Further documentation for configuration settings may be found at:
-# http://www.mediawiki.org/wiki/Manual:Configuration_settings
+# https://www.mediawiki.org/wiki/Manual:Configuration_settings
 
 # If you customize your file layout, set $IP to the directory that contains
 # the other MediaWiki files. It will be used as a base to locate files.
@@ -50,11 +50,12 @@ if ( $wgCommandLineMode ) {
 # $wgDisableOutputCompression = true;
 
 $wgSitename         = "Portal Wiki";
+$wgServer           = 'https://theportalwiki.com';
 
 ## The URL base path to the directory containing the wiki;
 ## defaults for all runtime URL paths are based off of this.
 ## For more information on customizing the URLs please see:
-## http://www.mediawiki.org/wiki/Manual:Short_URL
+## https://www.mediawiki.org/wiki/Manual:Short_URL
 $wgScriptPath       = "/w";
 $wgArticlePath      = "/wiki/$1";
 $wgScriptExtension  = ".php";
@@ -141,7 +142,7 @@ $wgDefaultSkin = 'vector';
 ## License and Creative Commons licenses are supported so far.
 $wgEnableCreativeCommonsRdf = true;
 $wgRightsPage = ""; # Set to the title of a wiki page that describes your license/copyright
-$wgRightsUrl = "http://creativecommons.org/licenses/by/3.0/";
+$wgRightsUrl = "https://creativecommons.org/licenses/by/3.0/";
 $wgRightsText = "Attribution 3.0 Unported (CC BY 3.0)";
 $wgRightsIcon = "/w/images/cc.png";
 # $wgRightsCode = "[license_code]"; # Not yet used
@@ -196,10 +197,10 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
 
   $wgUploadDirectory = "{$IP}/images";
 
-  $wgUploadPath = 'http://i1.theportalwiki.net/img';
-  $wgLoadScript = 'http://i2.theportalwiki.net/js.png';
-  $wgStylePath = 'http://i2.theportalwiki.net/w/skins';
-  $wgLogo = 'http://i2.theportalwiki.net/img/3/3b/Wiki_logo.png';
+  $wgUploadPath = 'https://i1.theportalwiki.net/img';
+  $wgLoadScript = 'https://i2.theportalwiki.net/js.png';
+  $wgStylePath = 'https://i2.theportalwiki.net/w/skins';
+  $wgLogo = 'https://i2.theportalwiki.net/img/3/3b/Wiki_logo.png';
 
   # Namespace aliases
   $wgNamespaceAliases['P'] = NS_PROJECT;
@@ -288,7 +289,7 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
   # Extra footer links
   #$wgHooks['SkinTemplateOutputPageBeforeExec'][] = '_footer_onionlink';
   #function _footer_onionlink( $sk, &$tpl ) {
-  #    // FIXME: This should not be hardcoded, see http://www.mediawiki.org/wiki/Manual:Footer
+  #    // FIXME: This should not be hardcoded, see https://www.mediawiki.org/wiki/Manual:Footer
   #    // However, that thing doesn't work for external links, so hardcoded it is.
   #    $tpl->set( 'onionlink', '<strong>Tor</strong>: <a href="http://3sls53hbzad3ortd.onion/" rel="nofollow">3sls53hbzad3ortd.onion</a>' );
   #    $tpl->data['footerlinks']['places'][] = 'onionlink';
@@ -313,7 +314,7 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
   if (function_exists('wfLoadExtension')) { wfLoadExtension('Cite'); } else { require_once( "$IP/extensions/Cite/Cite.php" ); }
 
   if (function_exists('wfLoadExtension')) { wfLoadExtension('RedditThumbnail'); } else { require_once( "$IP/extensions/RedditThumbnail/RedditThumbnail.php" ); }
-  $wgRedditThumbnailImage = 'http://i1.theportalwiki.net/img/c/c0/Wiki_logo_highres.png';
+  $wgRedditThumbnailImage = 'https://i1.theportalwiki.net/img/c/c0/Wiki_logo_highres.png';
   
   if (function_exists('wfLoadExtension')) { wfLoadExtension('ConfirmEdit'); } else { require_once( "$IP/extensions/ConfirmEdit/ConfirmEdit.php" ); }
   require_once("$IP/extensions/ConfirmEdit/QuestyCaptcha.php");
