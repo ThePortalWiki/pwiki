@@ -10,3 +10,6 @@
 [submodule "extra/extensions/Cite"]
 	path = extra/extensions/Cite
 	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Cite
+[submodule "extra/extensions/CodeEditor"]
+	path = extra/extensions/CodeEditor
+	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/CodeEditor
