@@ -155,10 +155,12 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
  
 # MANUAL ADDITIONS TO LOCALSETTINGS
 
-  # Load Vector skin. MediaWiki 1.24 requires manual listing of skins.
+  # Load Vector skin. MediaWiki 1.24+ requires manual listing of skins.
   if(function_exists('wfLoadSkin')) {
+    # MediaWiki 1.25+
     wfLoadSkin( 'Vector' );
-  } else {
+  } else if (file_exists("$IP/skins/Vector/Vector.php")) {
+    # MediaWiki 1.24
     require_once("$IP/skins/Vector/Vector.php");
   }
 

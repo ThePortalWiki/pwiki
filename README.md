@@ -2,7 +2,7 @@
 
 Incomplete because it wasn't open source from the beginning. Sorry.
 
-Current MediaWiki version: **1.24.6**
+Current MediaWiki version: **1.23.15**
 
 ## Upgrading MediaWiki
 
