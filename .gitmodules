@@ -7,3 +7,6 @@
 [submodule "extra/extensions/CategoryTree"]
 	path = extra/extensions/CategoryTree
 	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/CategoryTree
+[submodule "extra/extensions/Cite"]
+	path = extra/extensions/Cite
+	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Cite
