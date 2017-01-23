@@ -7,60 +7,18 @@
 [submodule "extra/extensions/CategoryTree"]
 	path = extra/extensions/CategoryTree
 	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/CategoryTree
-[submodule "extra/extensions/Cite"]
-	path = extra/extensions/Cite
-	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Cite
 [submodule "extra/extensions/CodeEditor"]
 	path = extra/extensions/CodeEditor
 	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/CodeEditor
-[submodule "extra/extensions/ConfirmEdit"]
-	path = extra/extensions/ConfirmEdit
-	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ConfirmEdit
-[submodule "extra/extensions/Gadgets"]
-	path = extra/extensions/Gadgets
-	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Gadgets
 [submodule "extra/extensions/GeeQuBox"]
 	path = extra/extensions/GeeQuBox
 	url = https://github.com/ThePortalWiki/GeeQuBox
-[submodule "extra/extensions/ImageMap"]
-	path = extra/extensions/ImageMap
-	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ImageMap
-[submodule "extra/extensions/InputBox"]
-	path = extra/extensions/InputBox
-	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/InputBox
-[submodule "extra/extensions/Interwiki"]
-	path = extra/extensions/Interwiki
-	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Interwiki
-[submodule "extra/extensions/LocalisationUpdate"]
-	path = extra/extensions/LocalisationUpdate
-	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/LocalisationUpdate
 [submodule "extra/extensions/MobileFrontend"]
 	path = extra/extensions/MobileFrontend
 	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/MobileFrontend
-[submodule "extra/extensions/Nuke"]
-	path = extra/extensions/Nuke
-	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Nuke
-[submodule "extra/extensions/ParserFunctions"]
-	path = extra/extensions/ParserFunctions
-	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ParserFunctions
-[submodule "extra/extensions/Poem"]
-	path = extra/extensions/Poem
-	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Poem
-[submodule "extra/extensions/Renameuser"]
-	path = extra/extensions/Renameuser
-	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Renameuser
 [submodule "extra/extensions/SecureHTML"]
 	path = extra/extensions/SecureHTML
 	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SecureHTML
-[submodule "extra/extensions/SpamBlacklist"]
-	path = extra/extensions/SpamBlacklist
-	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SpamBlacklist
-[submodule "extra/extensions/TitleBlacklist"]
-	path = extra/extensions/TitleBlacklist
-	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/TitleBlacklist
-[submodule "extra/extensions/WikiEditor"]
-	path = extra/extensions/WikiEditor
-	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/WikiEditor
 [submodule "extra/extensions/RedditThumbnail"]
 	path = extra/extensions/RedditThumbnail
 	url = https://github.com/ThePortalWiki/RedditThumbnail
