@@ -55,3 +55,6 @@
 [submodule "extra/extensions/SpamBlacklist"]
 	path = extra/extensions/SpamBlacklist
 	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SpamBlacklist
+[submodule "extra/extensions/TitleBlacklist"]
+	path = extra/extensions/TitleBlacklist
+	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/TitleBlacklist
