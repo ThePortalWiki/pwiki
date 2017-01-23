@@ -43,3 +43,6 @@
 [submodule "extra/extensions/ParserFunctions"]
 	path = extra/extensions/ParserFunctions
 	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ParserFunctions
+[submodule "extra/extensions/Poem"]
+	path = extra/extensions/Poem
+	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Poem
