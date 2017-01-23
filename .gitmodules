@@ -67,3 +67,6 @@
 [submodule "extra/extensions/RevQuery"]
 	path = extra/extensions/RevQuery
 	url = https://github.com/ThePortalWiki/RevQuery
+[submodule "extra/extensions/LangUtils"]
+	path = extra/extensions/LangUtils
+	url = https://github.com/ThePortalWiki/LangUtils
