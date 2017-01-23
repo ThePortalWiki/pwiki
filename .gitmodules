@@ -34,3 +34,6 @@
 [submodule "extra/extensions/LocalisationUpdate"]
 	path = extra/extensions/LocalisationUpdate
 	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/LocalisationUpdate
+[submodule "extra/extensions/MobileFrontend"]
+	path = extra/extensions/MobileFrontend
+	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/MobileFrontend
