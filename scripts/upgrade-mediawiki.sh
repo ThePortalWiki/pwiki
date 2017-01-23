@@ -36,31 +36,53 @@ if [ ! "$#" -eq 1 ]; then
 	exit 1
 fi
 
-# Download and verify the release.
 BUILD_DIR="$WEBROOT_PRIVATE/.mediawiki-tmp"
 rm -rf --one-file-system "$BUILD_DIR"
 mkdir --mode=700 "$BUILD_DIR"
+# Get the list of point releases before the given one.
+# For some reason, mediawiki-x.xx.(something more than 0).tar.gz does not always include
+# things that the point-0 release does (extensions), so we just build a kludge from all
+# point releases onwards to make sure we don't miss anything.
+currentRelease="$1"
+if ! basename "$currentRelease" | grep -qP '^mediawiki-[0-9]+\.[0-9]+\.([0-9]+)\.tar\.gz$'; then
+	echo "Cannot parse release number from '$currentRelease'." >&2
+	exit 1
+fi
+currentReleasePoint="$(basename "$currentRelease" | sed -r 's/^mediawiki-[0-9]+\.[0-9]+\.([0-9]+)\.tar\.gz$/\1/')"
+allReleases=()
+for point in $(seq 0 "$currentReleasePoint"); do
+	allReleases+=("$(dirname "$currentRelease")/$(basename "$currentRelease" | sed -r "s/^(mediawiki-[0-9]+\\.[0-9]+\\.)[0-9]+\\.tar\\.gz/\\1$point.tar.gz/")")
+done
+if [ "${#allReleases[@]}" -eq 0 ]; then
+	echo "Could not create release list for '$currentRelease'." >&2
+	exit 1
+fi
+STAGING_DIR="$BUILD_DIR/staging"
+mkdir --mode=700 "$STAGING_DIR"
+export GNUPGHOME="$BUILD_DIR/gnupg_tmp"
+mkdir --mode=700 "$GNUPGHOME"
+wget -O- "$GNUPG_KEYS" | gpg --import
 pushd "$BUILD_DIR"
-	# Download the release.
-	wget -O mediawiki.tar.gz "$1"
-	# Verify the release.
-	wget -O mediawiki.tar.gz.sig "$1.sig"
-	export GNUPGHOME="$BUILD_DIR/gnupg_tmp"
-	mkdir --mode=700 "$GNUPGHOME"
-	wget -O- "$GNUPG_KEYS" | gpg --import
-	if ! gpg --verify mediawiki.tar.gz.sig mediawiki.tar.gz; then
-		echo "Invalid signature on the release." >&2
-		exit 1
-	fi
+	for release in "${allReleases[@]}"; do
+		echo "Processing release: '$release'..."
+		# Download the release.
+		wget -O mediawiki.tar.gz "$release"
+		# Verify the release.
+		wget -O mediawiki.tar.gz.sig "$release.sig"
+		if ! gpg --verify mediawiki.tar.gz.sig mediawiki.tar.gz; then
+			echo "Invalid signature on the release." >&2
+			exit 1
+		fi
+		# Extract the release.
+		tar -xf mediawiki.tar.gz -C "$STAGING_DIR" --strip-components=1
+		rm -rf --one-file-system "$STAGING_DIR/images"
+		rm -f mediawiki.tar.gz
+	done
 popd
 
-# Extract the release.
-MEDIAWIKI_TAR_GZ="$BUILD_DIR/mediawiki.tar.gz"
 rm -rf --one-file-system "$MEDIAWIKI_TESTROOT"
-mkdir --mode=700 "$MEDIAWIKI_TESTROOT"
-tar -xf "$MEDIAWIKI_TAR_GZ" -C "$MEDIAWIKI_TESTROOT" --strip-components=1
+mv "$STAGING_DIR" "$MEDIAWIKI_TESTROOT"
 rm -rf --one-file-system "$BUILD_DIR"
-rm -rf --one-file-system "$MEDIAWIKI_TESTROOT/images"
 cp -r "$EXTRA_ROOT"/* "$MEDIAWIKI_TESTROOT/"
 chown -R --reference="$WEBROOT" "$MEDIAWIKI_TESTROOT"
 chmod -R u+rwX,g+rwX,o-rwx "$MEDIAWIKI_TESTROOT"
