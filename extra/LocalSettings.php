@@ -374,8 +374,6 @@ $randomHash
 
   if (function_exists('wfLoadExtension')) { wfLoadExtension('RevQuery'); } else { require_once( "$IP/extensions/RevQuery/RevQuery.php" ); }
 
-  #if (function_exists('wfLoadExtension')) { wfLoadExtension('SimpleAntiSpam'); } else { require_once( "$IP/extensions/SimpleAntiSpam/SimpleAntiSpam.php" ); }
-
   if (function_exists('wfLoadExtension')) { wfLoadExtension('SpamBlacklist'); } else { require_once( "$IP/extensions/SpamBlacklist/SpamBlacklist.php" ); }
   $wgSpamBlacklistFiles = array(
     "$IP/extensions/SpamBlacklist/wikimedia_blacklist"
