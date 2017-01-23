@@ -1,0 +1,32 @@
+# This configuration file is included inside the main https server block.
+
+root  /home/pwiki/www;
+location / {
+	error_page 404 = @mediawiki;
+}
+location @mediawiki {
+	rewrite ^/wiki/*$                   /w/index.php?title=Main_Page last;
+	rewrite ^/wiki/([^?]*)(?:\?(.*))?$  /w/index.php?title=$1&$2 last;
+}
+location /img/ {
+	rewrite ^/img/(.*)$                 /w/images/$1 last;
+}
+location = /js.png {
+	rewrite ^/js.png(?:\?(.*))?$        /w/load.php?$1 last;
+}
+location /pingdom {
+	auth_basic "Pingdom";
+	auth_basic_user_file $document_root/pingdom.txt;
+	fastcgi_split_path_info ^(.+\.php)(/.+)$;
+	include /etc/nginx/fastcgi_params;
+	fastcgi_param SCRIPT_FILENAME $document_root/pingdom.php;
+	fastcgi_pass phpfpm;
+}
+# Open fonts for inclusion on the Team Fortress Wiki.
+location ~ \.(eot|ttf|woff|svg)$ {
+	add_header Access-Control-Allow-Origin *;
+}
+location ~ pingdom.php$|pingdom.txt$ {
+	return 403;
+}
+include /etc/nginx/conf-templates/enable-php.conf;
