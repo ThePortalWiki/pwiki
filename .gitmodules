@@ -37,3 +37,6 @@
 [submodule "extra/extensions/MobileFrontend"]
 	path = extra/extensions/MobileFrontend
 	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/MobileFrontend
+[submodule "extra/extensions/Nuke"]
+	path = extra/extensions/Nuke
+	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Nuke
