@@ -49,3 +49,6 @@
 [submodule "extra/extensions/Renameuser"]
 	path = extra/extensions/Renameuser
 	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Renameuser
+[submodule "extra/extensions/SecureHTML"]
+	path = extra/extensions/SecureHTML
+	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SecureHTML
