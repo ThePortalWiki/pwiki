@@ -61,3 +61,6 @@
 [submodule "extra/extensions/WikiEditor"]
 	path = extra/extensions/WikiEditor
 	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/WikiEditor
+[submodule "extra/extensions/RedditThumbnail"]
+	path = extra/extensions/RedditThumbnail
+	url = https://github.com/ThePortalWiki/RedditThumbnail
