@@ -19,3 +19,6 @@
 [submodule "extra/extensions/Gadgets"]
 	path = extra/extensions/Gadgets
 	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Gadgets
+[submodule "extra/extensions/GeeQuBox"]
+	path = extra/extensions/GeeQuBox
+	url = https://github.com/ThePortalWiki/GeeQuBox
