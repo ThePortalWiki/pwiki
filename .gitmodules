@@ -28,3 +28,6 @@
 [submodule "extra/extensions/InputBox"]
 	path = extra/extensions/InputBox
 	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/InputBox
+[submodule "extra/extensions/Interwiki"]
+	path = extra/extensions/Interwiki
+	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Interwiki
