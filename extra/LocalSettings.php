@@ -273,6 +273,14 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
   # MIME type checking
   $wgVerifyMimeType = false;
 
+  # Vector skin features.
+  # TODO: Add https://www.mediawiki.org/wiki/Extension:CollapsibleVector to make these work.
+  $wgVectorUseSimpleSearch = true;
+  $wgVectorFeatures['collapsibletabs']['user'] = true;
+  $wgVectorFeatures['collapsiblenav']['global'] = false;
+  $wgVectorFeatures['collapsiblenav']['user'] = true;
+
+
   # Extra footer links
   #$wgHooks['SkinTemplateOutputPageBeforeExec'][] = '_footer_onionlink';
   #function _footer_onionlink( $sk, &$tpl ) {
@@ -286,11 +294,6 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
 
 # EXTENSIONS
   if (function_exists('wfLoadExtension')) { wfLoadExtension('ParserFunctions'); } else { require_once( "$IP/extensions/ParserFunctions/ParserFunctions.php" ); }
-  if (function_exists('wfLoadExtension')) { wfLoadExtension('Vector'); } else { require_once( "$IP/extensions/Vector/Vector.php" ); }
-  $wgVectorUseSimpleSearch = true;
-  $wgVectorFeatures['collapsibletabs']['user'] = true;
-  $wgVectorFeatures['collapsiblenav']['global'] = false;
-  $wgVectorFeatures['collapsiblenav']['user'] = true;
 
   #if (function_exists('wfLoadExtension')) { wfLoadExtension('CategoryTree'); } else { require_once( "$IP/extensions/CategoryTree/CategoryTree.php" ); }
   
