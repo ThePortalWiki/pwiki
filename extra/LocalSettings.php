@@ -155,6 +155,11 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
  
 # MANUAL ADDITIONS TO LOCALSETTINGS
 
+  # Load Vector skin. MediaWiki 1.25 requires manual listing of skins.
+  if(function_exists('wfLoadSkin')) {
+    wfLoadSkin( 'Vector' );
+  }
+
   # mw_secrets.php contains something like:
   # <?php
   # $wgDBpassword = "...";
@@ -280,31 +285,30 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
 
 
 # EXTENSIONS
-  require_once("$IP/extensions/ParserFunctions/ParserFunctions.php");
-  require_once("$IP/extensions/Vector/Vector.php");
+  if (function_exists('wfLoadExtension')) { wfLoadExtension('ParserFunctions'); } else { require_once( "$IP/extensions/ParserFunctions/ParserFunctions.php" ); }
+  if (function_exists('wfLoadExtension')) { wfLoadExtension('Vector'); } else { require_once( "$IP/extensions/Vector/Vector.php" ); }
   $wgVectorUseSimpleSearch = true;
   $wgVectorFeatures['collapsibletabs']['user'] = true;
   $wgVectorFeatures['collapsiblenav']['global'] = false;
   $wgVectorFeatures['collapsiblenav']['user'] = true;
 
-  #require_once("$IP/extensions/CategoryTree/CategoryTree.php");
+  #if (function_exists('wfLoadExtension')) { wfLoadExtension('CategoryTree'); } else { require_once( "$IP/extensions/CategoryTree/CategoryTree.php" ); }
   
-  wfLoadExtension( 'UserMerge' );
+  if (function_exists('wfLoadExtension')) { wfLoadExtension('UserMerge'); } else { require_once( "$IP/extensions/UserMerge/UserMerge.php" ); }
 
-  require_once("$IP/extensions/WikiEditor/WikiEditor.php");
+  if (function_exists('wfLoadExtension')) { wfLoadExtension('WikiEditor'); } else { require_once( "$IP/extensions/WikiEditor/WikiEditor.php" ); }
   $wgDefaultUserOptions['usebetatoolbar'] = 1;
   $wgDefaultUserOptions['usebetatoolbar-cgd'] = 1;
   $wgDefaultUserOptions['wikieditor-preview'] = 1;
   $wgDefaultUserOptions['wikieditor-publish'] = 1;
 
-  require_once("$IP/extensions/CodeEditor/CodeEditor.php");
+  if (function_exists('wfLoadExtension')) { wfLoadExtension('CodeEditor'); } else { require_once( "$IP/extensions/CodeEditor/CodeEditor.php" ); }
+  if (function_exists('wfLoadExtension')) { wfLoadExtension('Cite'); } else { require_once( "$IP/extensions/Cite/Cite.php" ); }
 
-  require_once("$IP/extensions/Cite/Cite.php");
-
+  if (function_exists('wfLoadExtension')) { wfLoadExtension('RedditThumbnail'); } else { require_once( "$IP/extensions/RedditThumbnail/RedditThumbnail.php" ); }
   $wgRedditThumbnailImage = 'http://i1.theportalwiki.net/img/c/c0/Wiki_logo_highres.png';
-  require_once("$IP/extensions/RedditThumbnail/RedditThumbnail.php");
   
-  require_once("$IP/extensions/ConfirmEdit/ConfirmEdit.php");
+  if (function_exists('wfLoadExtension')) { wfLoadExtension('ConfirmEdit'); } else { require_once( "$IP/extensions/ConfirmEdit/ConfirmEdit.php" ); }
   require_once("$IP/extensions/ConfirmEdit/QuestyCaptcha.php");
   $wgCaptchaClass = 'QuestyCaptcha';
   # $wgReCaptchaPublicKey and $wgReCaptchaPrivateKey are defined in mw_secrets.php
@@ -317,9 +321,9 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
 $randomHash 
 );
 
-  require_once("$IP/extensions/EmbedVideo/EmbedVideo.php");
+  if (function_exists('wfLoadExtension')) { wfLoadExtension('EmbedVideo'); } else { require_once( "$IP/extensions/EmbedVideo/EmbedVideo.php" ); }
 
-  require_once("$IP/extensions/LangUtils/LangUtils.php");
+  if (function_exists('wfLoadExtension')) { wfLoadExtension('LangUtils'); } else { require_once( "$IP/extensions/LangUtils/LangUtils.php" ); }
   $wgAllowedLanguages = array( 
       'ar', 
       'cs', 
@@ -345,13 +349,13 @@ $randomHash
       'zh-hant'
   );
 
-  require_once("$IP/extensions/Substring_and_strlen/Substring_and_strlen.php");
+  if (function_exists('wfLoadExtension')) { wfLoadExtension('Substring_and_strlen'); } else { require_once( "$IP/extensions/Substring_and_strlen/Substring_and_strlen.php" ); }
 
-  require_once("$IP/extensions/MediawikiPlayer/MediawikiPlayer.php");
+  if (function_exists('wfLoadExtension')) { wfLoadExtension('MediawikiPlayer'); } else { require_once( "$IP/extensions/MediawikiPlayer/MediawikiPlayer.php" ); }
 
-  require_once("$IP/extensions/GeeQuBox/GeeQuBox.php");
+  if (function_exists('wfLoadExtension')) { wfLoadExtension('GeeQuBox'); } else { require_once( "$IP/extensions/GeeQuBox/GeeQuBox.php" ); }
 
-  require_once("$IP/extensions/TitleBlacklist/TitleBlacklist.php");
+  if (function_exists('wfLoadExtension')) { wfLoadExtension('TitleBlacklist'); } else { require_once( "$IP/extensions/TitleBlacklist/TitleBlacklist.php" ); }
   $wgTitleBlacklistSources = array(
           array(
                   'type' => TBLSRC_LOCALPAGE,
@@ -359,22 +363,20 @@ $randomHash
           )
   );
 
-  wfLoadExtension( 'CharInsert' );
+  if (function_exists('wfLoadExtension')) { wfLoadExtension('CharInsert'); } else { require_once( "$IP/extensions/CharInsert/CharInsert.php" ); }
 
-  require_once("$IP/extensions/Interwiki/Interwiki.php");
+  if (function_exists('wfLoadExtension')) { wfLoadExtension('Interwiki'); } else { require_once( "$IP/extensions/Interwiki/Interwiki.php" ); }
   $wgGroupPermissions['*']['interwiki'] = false;
   $wgGroupPermissions['sysop']['interwiki'] = true;
 
-  require_once("$IP/extensions/Secured_HTML/Secured_HTML.php");
+  if (function_exists('wfLoadExtension')) { wfLoadExtension('Secured_HTML'); } else { require_once( "$IP/extensions/Secured_HTML/Secured_HTML.php" ); }
   $wgGroupPermissions['coding']['coding'] = true;
 
-  require_once("$IP/extensions/revquery/RevQuery.php");
+  if (function_exists('wfLoadExtension')) { wfLoadExtension('RevQuery'); } else { require_once( "$IP/extensions/RevQuery/RevQuery.php" ); }
 
-  #require_once("$IP/extensions/SimpleAntiSpam/SimpleAntiSpam.php");
+  #if (function_exists('wfLoadExtension')) { wfLoadExtension('SimpleAntiSpam'); } else { require_once( "$IP/extensions/SimpleAntiSpam/SimpleAntiSpam.php" ); }
 
-  require_once("$IP/extensions/SpamBlacklist/SpamBlacklist.php");
-  	$wgSpamBlacklistFiles = array(
-		"$IP/extensions/SpamBlacklist/wikimedia_blacklist"
-	);
-
-?>
+  if (function_exists('wfLoadExtension')) { wfLoadExtension('SpamBlacklist'); } else { require_once( "$IP/extensions/SpamBlacklist/SpamBlacklist.php" ); }
+  $wgSpamBlacklistFiles = array(
+    "$IP/extensions/SpamBlacklist/wikimedia_blacklist"
+  );
