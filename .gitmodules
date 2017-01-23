@@ -70,3 +70,6 @@
 [submodule "extra/extensions/LangUtils"]
 	path = extra/extensions/LangUtils
 	url = https://github.com/ThePortalWiki/LangUtils
+[submodule "extra/extensions/EmbedVideo"]
+	path = extra/extensions/EmbedVideo
+	url = https://github.com/HydraWiki/mediawiki-embedvideo
