@@ -4,3 +4,6 @@
 [submodule "extra/extensions/CharInsert"]
 	path = extra/extensions/CharInsert
 	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/CharInsert
+[submodule "extra/extensions/CategoryTree"]
+	path = extra/extensions/CategoryTree
+	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/CategoryTree
