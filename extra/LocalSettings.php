@@ -372,7 +372,7 @@ $randomHash
   $wgGroupPermissions['*']['interwiki'] = false;
   $wgGroupPermissions['sysop']['interwiki'] = true;
 
-  if (function_exists('wfLoadExtension')) { wfLoadExtension('Secured_HTML'); } else { require_once( "$IP/extensions/Secured_HTML/Secured_HTML.php" ); }
+  if (function_exists('wfLoadExtension')) { wfLoadExtension('SecureHTML'); } else { require_once( "$IP/extensions/SecureHTML/SecureHTML.php" ); }
   $wgGroupPermissions['coding']['coding'] = true;
 
   # No patch exists for current MediaWiki; update please?
