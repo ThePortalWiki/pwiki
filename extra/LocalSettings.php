@@ -77,10 +77,10 @@ $wgEmailAuthentication = true;
 
 ## Database settings
 $wgDBtype           = "mysql";
-$wgDBserver         = "localhost";
-$wgDBname           = "portalwiki";
-$wgDBuser           = "portalwiki";
-# $wgDBpassword is defined in mw_secrets.php
+# TODO: This is temporary until this app is behind a container as well, at which point
+#       it will just be able to use the DNS name with the default port number.
+$wgDBserver         = "127.0.0.1:3666";
+# Other database settings are defined in mw_secrets.php
 
 # MySQL specific settings
 $wgDBprefix         = "p2_";
