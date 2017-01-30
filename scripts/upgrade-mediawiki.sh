@@ -3,18 +3,31 @@
 set -e
 set -x
 
+if [ "$(id -u)" -ne 0 ]; then
+	echo 'This script is meant to run as root.'
+	exit 1
+fi
+
 scriptDir="$(cd "$(dirname "${BASH_SOURCE[@]}")" && pwd)"
-EXTRA_ROOT="$scriptDir/../extra"
+CONTAINER_APP_NAME=pwiki-app
+CONTAINER_DATABASE_NAME=pwiki-mariadb
+IMAGES_DIR="$scriptDir/../images"
+EXTRA_ROOT="$scriptDir/../images/$CONTAINER_APP_NAME/extra"
 FUSECOMPRESS_MOUNT="$scriptDir/fusecompress-mount.sh"
-WEBROOT="$HOME/www"
-WEBROOT_PRIVATE="$HOME/www-private"
+MEDIAWIKI_USER=pwiki
+MEDIAWIKI_USER_HOME="$(eval echo "~$MEDIAWIKI_USER")"
+WEBROOT="$MEDIAWIKI_USER_HOME/www"
+WEBROOT_PRIVATE="$MEDIAWIKI_USER_HOME/www-private"
+BUILD_DIR="$WEBROOT_PRIVATE/.mediawiki-tmp"
+STAGING_DIR="$BUILD_DIR/staging"
 MEDIAWIKI_PRODROOT="$WEBROOT/w"
 MEDIAWIKI_PRODROOT_BACKUP="$WEBROOT_PRIVATE/w.old"
 MEDIAWIKI_TESTROOT="$WEBROOT_PRIVATE/w.new"
-MEDIAWIKI_MAINTENANCE_DIRECTORY="$MEDIAWIKI_PRODROOT/maintenance"
-MEDIAWIKI_MAINTENANCE_UPDATE_SCRIPT='update.php'
+MEDIAWIKI_IMAGES_MOUNTPOINT="$MEDIAWIKI_PRODROOT/images"
+SECRETS_DIR=/etc/pwiki/pwiki-secrets
 ROOT_URL='https://theportalwiki.com'
 GNUPG_KEYS='https://www.mediawiki.org/keys/keys.txt'
+PHP_FPM_BIND_HOSTPORT=127.0.0.1:3777
 
 if [ ! -d "$MEDIAWIKI_PRODROOT" ]; then
 	echo "Cannot find MediaWiki root '$MEDIAWIKI_PRODROOT'." >&2
@@ -26,19 +39,11 @@ if [ ! -d "$EXTRA_ROOT" ]; then
 	exit 1
 fi
 
-# Make sure all submodules are checked out.
-pushd "$EXTRA_ROOT"
-	git submodule update --init --recursive
-popd
-
 if [ ! "$#" -eq 1 ]; then
 	echo "Usage: $0 https://releases.wikimedia.org/mediawiki/x.xx/mediawiki-x.xx.xx.tar.gz" >&2
 	exit 1
 fi
 
-BUILD_DIR="$WEBROOT_PRIVATE/.mediawiki-tmp"
-rm -rf --one-file-system "$BUILD_DIR"
-mkdir --mode=700 "$BUILD_DIR"
 # Get the list of point releases before the given one.
 # For some reason, mediawiki-x.xx.(something more than 0).tar.gz does not always include
 # things that the point-0 release does (extensions), so we just build a kludge from all
@@ -48,6 +53,8 @@ if ! basename "$currentRelease" | grep -qP '^mediawiki-[0-9]+\.[0-9]+\.([0-9]+)\
 	echo "Cannot parse release number from '$currentRelease'." >&2
 	exit 1
 fi
+currentReleaseTag="$(basename "$currentRelease" | sed -r 's/^mediawiki-([0-9]+\.[0-9]+\.[0-9]+)\.tar\.gz$/\1/')"
+
 currentReleasePoint="$(basename "$currentRelease" | sed -r 's/^mediawiki-[0-9]+\.[0-9]+\.([0-9]+)\.tar\.gz$/\1/')"
 allReleases=()
 for point in $(seq 0 "$currentReleasePoint"); do
@@ -57,8 +64,18 @@ if [ "${#allReleases[@]}" -eq 0 ]; then
 	echo "Could not create release list for '$currentRelease'." >&2
 	exit 1
 fi
-STAGING_DIR="$BUILD_DIR/staging"
-mkdir --mode=700 "$STAGING_DIR"
+
+# Make sure all submodules are checked out.
+pushd "$EXTRA_ROOT"
+	sudo -u "$MEDIAWIKI_USER" git submodule update --init --recursive
+popd
+
+# Build containers.
+docker build --tag="$CONTAINER_DATABASE_NAME" "$IMAGES_DIR/$CONTAINER_DATABASE_NAME"
+docker build --build-arg="MEDIAWIKI_RELEASE=$currentRelease" --build-arg="WIKI_UIDGID=$(stat -c '%u:%g' "$WEBROOT")" --tag="$CONTAINER_APP_NAME:$currentReleaseTag" "$IMAGES_DIR/$CONTAINER_APP_NAME"
+
+rm -rf --one-file-system "$BUILD_DIR"
+mkdir --mode=700 "$BUILD_DIR" "$STAGING_DIR"
 export GNUPGHOME="$BUILD_DIR/gnupg_tmp"
 mkdir --mode=700 "$GNUPGHOME"
 wget -O- "$GNUPG_KEYS" | gpg --import
@@ -78,6 +95,8 @@ pushd "$BUILD_DIR"
 		rm -rf --one-file-system "$STAGING_DIR/images"
 		rm -f mediawiki.tar.gz
 	done
+	# Remove all PHP files, as they should be executed from within the container.
+	rm "$STAGING_DIR"/**/*.php
 popd
 
 rm -rf --one-file-system "$MEDIAWIKI_TESTROOT"
@@ -87,34 +106,36 @@ cp -r "$EXTRA_ROOT"/* "$MEDIAWIKI_TESTROOT/"
 chown -R --reference="$WEBROOT" "$MEDIAWIKI_TESTROOT"
 chmod -R u+rwX,g+rwX,o-rwx "$MEDIAWIKI_TESTROOT"
 
-# Swap release directory and set up new release.
-"$FUSECOMPRESS_MOUNT" unmount
+run_app() {
+	echo "Running container app with tag '$1'." >&2
+	docker run --detach --name="$CONTAINER_APP_NAME" --link="$CONTAINER_DATABASE_NAME:$CONTAINER_DATABASE_NAME" --volume="$SECRETS_DIR:/pwiki-secrets" --volume="$MEDIAWIKI_IMAGES_MOUNTPOINT:$MEDIAWIKI_IMAGES_MOUNTPOINT" --publish="$PHP_FPM_BIND_HOSTPORT:9000" "$1"
+}
+
+# Determine currently-running release.
+OLD_TAG="$(docker inspect --format='{{.Config.Image}}' "$CONTAINER_APP_NAME")"
+if [ -z "$OLD_TAG" ]; then
+	echo "Cannot determine image tag of running '$CONTAINER_APP_NAME' container." >&2
+	exit 1
+fi
+
+# Swap releases.
+docker rm -f "$CONTAINER_APP_NAME"
+sudo -u "$MEDIAWIKI_USER" "$FUSECOMPRESS_MOUNT" unmount
 mv "$MEDIAWIKI_PRODROOT" "$MEDIAWIKI_PRODROOT_BACKUP"
 mv "$MEDIAWIKI_TESTROOT" "$MEDIAWIKI_PRODROOT"
-"$FUSECOMPRESS_MOUNT" mount
+sudo -u "$MEDIAWIKI_USER" "$FUSECOMPRESS_MOUNT" mount
+run_app "$CONTAINER_APP_NAME:$currentReleaseTag"
 
 revert_mw() {
 	echo 'Reverting release.'
-	"$FUSECOMPRESS_MOUNT" unmount
+	docker rm -f "$CONTAINER_APP_NAME"
+	sudo -u "$MEDIAWIKI_USER" "$FUSECOMPRESS_MOUNT" unmount
 	mv "$MEDIAWIKI_PRODROOT" "$MEDIAWIKI_TESTROOT"
 	mv "$MEDIAWIKI_PRODROOT_BACKUP" "$MEDIAWIKI_PRODROOT"
-	"$FUSECOMPRESS_MOUNT" mount
+	sudo -u "$MEDIAWIKI_USER" "$FUSECOMPRESS_MOUNT" mount
+	run_app "$OLD_TAG"
 	rm -rf --one-file-system "$MEDIAWIKI_TESTROOT"
 }
-
-# Run upgrade maintenance script. Needs to be run from its own directory, per MediaWiki manual.
-failed=false
-pushd "$MEDIAWIKI_MAINTENANCE_DIRECTORY"
-	if ! php "$MEDIAWIKI_MAINTENANCE_UPDATE_SCRIPT"; then
-		failed=true
-	fi
-popd
-if [ "$failed" == true ]; then
-	# Need to run this while outside MEDIAWIKI_MAINTENANCE_DIRECTORY, otherwise the shell
-	# will complain that the revert_mw will delete its own current directory.
-	revert_mw
-	exit 1
-fi
 
 # Manual testing of new release.
 echo "Please try out the new release at '$ROOT_URL'."

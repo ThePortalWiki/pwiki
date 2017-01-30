@@ -1,33 +1,33 @@
 [submodule "extra/extensions/UserMerge"]
-	path = extra/extensions/UserMerge
+	path = images/pwiki-app/extra/extensions/UserMerge
 	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/UserMerge
 [submodule "extra/extensions/CharInsert"]
-	path = extra/extensions/CharInsert
+	path = images/pwiki-app/extra/extensions/CharInsert
 	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/CharInsert
 [submodule "extra/extensions/CategoryTree"]
-	path = extra/extensions/CategoryTree
+	path = images/pwiki-app/extra/extensions/CategoryTree
 	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/CategoryTree
 [submodule "extra/extensions/CodeEditor"]
-	path = extra/extensions/CodeEditor
+	path = images/pwiki-app/extra/extensions/CodeEditor
 	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/CodeEditor
 [submodule "extra/extensions/GeeQuBox"]
-	path = extra/extensions/GeeQuBox
+	path = images/pwiki-app/extra/extensions/GeeQuBox
 	url = https://github.com/ThePortalWiki/GeeQuBox
 [submodule "extra/extensions/MobileFrontend"]
-	path = extra/extensions/MobileFrontend
+	path = images/pwiki-app/extra/extensions/MobileFrontend
 	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/MobileFrontend
 [submodule "extra/extensions/SecureHTML"]
-	path = extra/extensions/SecureHTML
+	path = images/pwiki-app/extra/extensions/SecureHTML
 	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SecureHTML
 [submodule "extra/extensions/RedditThumbnail"]
-	path = extra/extensions/RedditThumbnail
+	path = images/pwiki-app/extra/extensions/RedditThumbnail
 	url = https://github.com/ThePortalWiki/RedditThumbnail
 [submodule "extra/extensions/RevQuery"]
-	path = extra/extensions/RevQuery
+	path = images/pwiki-app/extra/extensions/RevQuery
 	url = https://github.com/ThePortalWiki/RevQuery
 [submodule "extra/extensions/LangUtils"]
-	path = extra/extensions/LangUtils
+	path = images/pwiki-app/extra/extensions/LangUtils
 	url = https://github.com/ThePortalWiki/LangUtils
 [submodule "extra/extensions/EmbedVideo"]
-	path = extra/extensions/EmbedVideo
+	path = images/pwiki-app/extra/extensions/EmbedVideo
 	url = https://github.com/HydraWiki/mediawiki-embedvideo

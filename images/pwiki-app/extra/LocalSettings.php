@@ -77,10 +77,8 @@ $wgEmailAuthentication = true;
 
 ## Database settings
 $wgDBtype           = "mysql";
-# TODO: This is temporary until this app is behind a container as well, at which point
-#       it will just be able to use the DNS name with the default port number.
-$wgDBserver         = "127.0.0.1:3666";
-# Other database settings are defined in mw_secrets.php
+$wgDBserver         = "pwiki-mariadb";
+# Other database settings are defined in mediawiki-secrets.php
 
 # MySQL specific settings
 $wgDBprefix         = "p2_";
@@ -131,7 +129,7 @@ $wgLocalInterwiki   = strtolower($wgSitename);
 
 $wgLanguageCode = "en";
 
-# $wgSecretKey is defined in mw_secrets.php
+# $wgSecretKey is defined in mediawiki-secrets.php
 
 ## Default skin: you can change the default skin. Use the internal symbolic
 ## names, ie 'vector', 'monobook':
@@ -165,13 +163,7 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
     require_once("$IP/skins/Vector/Vector.php");
   }
 
-  # mw_secrets.php contains something like:
-  # <?php
-  # $wgDBpassword = "...";
-  # $wgSecretKey = "...";
-  # $wgReCaptchaPublicKey = '...';
-  # $wgReCaptchaPrivateKey = '...';
-  require_once( "/home/pwiki/www-private/mw_secrets.php" );
+  require_once( '/home/pwiki/www-private/mediawiki-secrets.php' );
 
   # Set time listed in signatures to UTC:
   $wgLocaltimezone = 'UTC';
@@ -319,7 +311,7 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
   if (function_exists('wfLoadExtension')) { wfLoadExtension('ConfirmEdit'); } else { require_once( "$IP/extensions/ConfirmEdit/ConfirmEdit.php" ); }
   require_once("$IP/extensions/ConfirmEdit/QuestyCaptcha.php");
   $wgCaptchaClass = 'QuestyCaptcha';
-  # $wgReCaptchaPublicKey and $wgReCaptchaPrivateKey are defined in mw_secrets.php
+  # $wgReCaptchaPublicKey and $wgReCaptchaPrivateKey are defined in mediawiki-secrets.php
   $randomHash = substr(sha1(strval(rand())), rand(1, 4), rand(12, 16));
   $randomHashSplitIndex = rand(2, strlen($randomHash) - 2);
   $randomHashPart1 = substr($randomHash, 0, $randomHashSplitIndex);
