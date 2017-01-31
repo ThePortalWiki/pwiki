@@ -5,7 +5,7 @@ Incomplete because it wasn't open source from the beginning. Sorry.
 ## Current versions
 
 * MediaWiki: **1.23.15**
-* PHP: TODO
+* PHP: **5.x**
 * MariaDB: **10.x**
 
 ## Setup
