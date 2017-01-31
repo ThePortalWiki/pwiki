@@ -26,4 +26,7 @@ popd
 # every once in a while.
 bash -c 'while true; do php-fpm; done' &
 bash -c 'while true; do sleep 6h; pkill php-fpm; done' &
+
+# Run MediaWiki jobs every once in a while.
+sudo -u pwiki bash -c 'cd "$HOME/www/w"; while true; do php maintenance/runJobs.php --maxjobs 10; sleep 5m; done' &
 wait
