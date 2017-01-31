@@ -119,7 +119,7 @@ if [ -z "$OLD_TAG" ]; then
 fi
 
 # Swap releases.
-docker rm -f "$CONTAINER_APP_NAME"
+docker rm -f "$CONTAINER_APP_NAME" || true
 sudo -u "$MEDIAWIKI_USER" "$FUSECOMPRESS_MOUNT" unmount
 mv "$MEDIAWIKI_PRODROOT" "$MEDIAWIKI_PRODROOT_BACKUP"
 mv "$MEDIAWIKI_TESTROOT" "$MEDIAWIKI_PRODROOT"
@@ -128,7 +128,7 @@ run_app "$CONTAINER_APP_NAME:$currentReleaseTag"
 
 revert_mw() {
 	echo 'Reverting release.'
-	docker rm -f "$CONTAINER_APP_NAME"
+	docker rm -f "$CONTAINER_APP_NAME" || true
 	sudo -u "$MEDIAWIKI_USER" "$FUSECOMPRESS_MOUNT" unmount
 	mv "$MEDIAWIKI_PRODROOT" "$MEDIAWIKI_TESTROOT"
 	mv "$MEDIAWIKI_PRODROOT_BACKUP" "$MEDIAWIKI_PRODROOT"
