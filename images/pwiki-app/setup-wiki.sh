@@ -2,7 +2,7 @@
 
 set -e
 set -x
-apt-get install -y sudo gnupg2 wget curl libcurl4-openssl-dev libmcrypt-dev libpng-dev libxml2-dev imagemagick psutils
+apt-get install -y sudo gnupg2 wget curl libcurl4-openssl-dev libmcrypt-dev libpng-dev libxml2-dev imagemagick psutils msmtp
 
 docker-php-ext-install -j"$(nproc)" curl dom fileinfo gd iconv json mbstring mcrypt mysql session xml zip
 
@@ -18,19 +18,19 @@ if ! echo "$WIKI_GID" | grep -qP '^[0-9]+$'; then
 	echo "Invalid UID:GID pair: '$WIKI_UIDGID'" >&2
 	exit 1
 fi
-TARGET_CONFIG=/usr/local/etc/php-fpm.d/www.conf
-if [ ! -e "$TARGET_CONFIG" ]; then
-	echo "Expected config file '$TARGET_CONFIG' not found."
+PHPFPM_CONFIG=/usr/local/etc/php-fpm.d/www.conf
+if [ ! -e "$PHPFPM_CONFIG" ]; then
+	echo "Expected config file '$PHPFPM_CONFIG' not found."
 	exit 1
 fi
+PHP_SENDMAIL_CONFIG=/usr/local/etc/php/conf.d/wiki-sendmail.ini
 
 groupadd --gid="$WIKI_GID" pwiki
 useradd --uid="$WIKI_UID" --gid=pwiki -s /bin/bash -d /home/pwiki -m pwiki
 mkdir -p ~pwiki/www/w ~pwiki/www-private
-chmod -R g-rwx,o-rwx ~pwiki
-chown -R pwiki:pwiki ~pwiki
+MSMTP_CONFIG="$(eval echo '~pwiki/www-private/msmtp.conf')"
 
-cat << EOF > "$TARGET_CONFIG"
+cat << EOF > "$PHPFPM_CONFIG"
 [www]
 user = pwiki
 group = pwiki
@@ -41,3 +41,25 @@ pm.start_servers = 2
 pm.min_spare_servers = 2
 pm.max_spare_servers = 3
 EOF
+
+cat << EOF > "$MSMTP_CONFIG"
+# Accounts will inherit settings from this section
+defaults
+auth             on
+tls              on
+tls_certcheck    on
+tls_trust_file   /etc/ssl/certs/ca-certificates.crt
+
+account        portal2wiki
+host           smtp.gmail.com
+port           587
+from           portal2wiki@gmail.com
+user           portal2wiki@gmail.com
+passwordeval   "cat /home/pwiki/www-private/smtp-password"
+
+account default : portal2wiki
+EOF
+echo "sendmail_path = \"$(which msmtp) -C $MSMTP_CONFIG -t\"" > "$PHP_SENDMAIL_CONFIG"
+
+chmod -R g-rwx,o-rwx ~pwiki
+chown -R pwiki:pwiki ~pwiki

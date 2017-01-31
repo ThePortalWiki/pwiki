@@ -7,7 +7,8 @@ if [ -e /pwiki-secrets/no-volume -o -e /home/pwiki/www/w/images/no-volume ]; the
 	exit 1
 fi
 cp /pwiki-secrets/mediawiki-secrets.php ~pwiki/www-private/mediawiki-secrets.php
-chown pwiki:pwiki ~pwiki/www-private/mediawiki-secrets.php
+cp /pwiki-secrets/smtp-password ~pwiki/www-private/smtp-password
+chown -R pwiki:pwiki ~pwiki/www-private
 
 pushd ~pwiki/www/w/maintenance
 	# Sanity check that the database is up and running.

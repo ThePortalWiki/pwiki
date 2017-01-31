@@ -44,6 +44,12 @@ $wgReCaptchaPublicKey = 'something';
 $wgReCaptchaPrivateKey = 'something';
 ```
 
+Put something like this in `/etc/pwiki/pwiki-secrets/smtp-password`:
+
+```
+the_smtp_password_to_portal2wiki_gmail_account
+```
+
 ### MariaDB container
 
 TODO: Set up backup container too so that there's no need to publish a port here.
