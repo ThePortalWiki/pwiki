@@ -52,12 +52,24 @@ the_smtp_password_to_portal2wiki_gmail_account
 
 ### MariaDB container
 
-TODO: Set up backup container too so that there's no need to publish a port here.
-
 ```bash
 $ docker build --tag=pwiki-mariadb images/pwiki-mariadb
-$ docker run --rm --detach --name=pwiki-mariadb --volume=/etc/pwiki/pwiki-secrets:/pwiki-secrets --volume=/var/lib/mysql-pwiki:/var/lib/mysql --publish=127.0.0.1:3666:3306 pwiki-mariadb
+$ docker run --rm --detach --name=pwiki-mariadb --volume=/etc/pwiki/pwiki-secrets:/pwiki-secrets --volume=/var/lib/mysql-pwiki:/var/lib/mysql pwiki-mariadb
 ```
+
+### MariaDB backup
+
+Database backups are LZMA-compressed SQL statements.
+
+The `backup-database.sh` script will build a backup container, connect to the running `pwiki-mariab` database container, dump everything to SQL, and compress it with `xz`. The file is moved atomically to the backup file, so there is no risk of copying an incomplete in-progress backup. The backup file will be `chmod`'d `440` with the same UID and GID as its parent directory. It is expected that this user will not change often over time.
+
+The script takes two arguments: the secrets directory, and the full path of the file to back up to.
+
+```bash
+$ ./scripts/backup-database.sh /etc/pwiki/pwiki-secrets "/var/lib/mysql-pwiki-backups/$(date '+%Y-%m-%d').sql.xz"
+```
+
+A sample `crontab` entry to automate backups is provided in `crontab/root.crontab`.
 
 ### PHP-FPM application container
 
