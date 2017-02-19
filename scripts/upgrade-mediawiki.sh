@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-set -e
-set -x
+set -euxo pipefail
+shopt -s globstar extglob
 
 if [ "$(id -u)" -ne 0 ]; then
 	echo 'This script is meant to run as root.'
@@ -96,13 +96,15 @@ pushd "$BUILD_DIR"
 		rm -f mediawiki.tar.gz
 	done
 	# Remove all PHP files, as they should be executed from within the container.
-	rm "$STAGING_DIR"/**/*.php
+	rm "$STAGING_DIR"/**/*.{php,php5}
 popd
 
 rm -rf --one-file-system "$MEDIAWIKI_TESTROOT"
 mv "$STAGING_DIR" "$MEDIAWIKI_TESTROOT"
 rm -rf --one-file-system "$BUILD_DIR"
 cp -r "$EXTRA_ROOT"/* "$MEDIAWIKI_TESTROOT/"
+# Remove all PHP files copied from EXTRA_ROOT, as they should be executed from within the container.
+rm "$MEDIAWIKI_TESTROOT"/**/*.php
 chown -R --reference="$WEBROOT" "$MEDIAWIKI_TESTROOT"
 chmod -R u+rwX,g+rwX,o-rwx "$MEDIAWIKI_TESTROOT"
 

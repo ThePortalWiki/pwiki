@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
-set -x
+set -euxo pipefail
 
 WEBROOT="$HOME/www"
 IMAGES_ROOT="$HOME/www-private/pwiki-images"
