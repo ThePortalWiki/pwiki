@@ -95,16 +95,19 @@ pushd "$BUILD_DIR"
 		rm -rf --one-file-system "$STAGING_DIR/images"
 		rm -f mediawiki.tar.gz
 	done
-	# Remove all PHP files, as they should be executed from within the container.
-	rm "$STAGING_DIR"/**/*.{php,php5}
 popd
 
 rm -rf --one-file-system "$MEDIAWIKI_TESTROOT"
 mv "$STAGING_DIR" "$MEDIAWIKI_TESTROOT"
 rm -rf --one-file-system "$BUILD_DIR"
 cp -r "$EXTRA_ROOT"/* "$MEDIAWIKI_TESTROOT/"
-# Remove all PHP files copied from EXTRA_ROOT, as they should be executed from within the container.
-rm "$MEDIAWIKI_TESTROOT"/**/*.php
+# Replace all PHP files copied from EXTRA_ROOT, as they should be executed from within the container.
+for phpFile in "$MEDIAWIKI_TESTROOT"/**/*.php; do
+	cat << EOF > "$phpFile"
+<?php
+die('This file should never be executed from outside the PHP-FPM container. Something is wrong with the wiki setup. If you see this and have no idea what this error message is about, please contact a Wiki staff member.');
+EOF
+done
 chown -R --reference="$WEBROOT" "$MEDIAWIKI_TESTROOT"
 chmod -R u+rwX,g+rwX,o-rwx "$MEDIAWIKI_TESTROOT"
 
