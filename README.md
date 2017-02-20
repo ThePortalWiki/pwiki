@@ -50,6 +50,24 @@ Put something like this in `/etc/pwiki/pwiki-secrets/smtp-password`:
 the_smtp_password_to_portal2wiki_gmail_account
 ```
 
+### Backups
+
+Backups are done by remote machines over SSH. Running the following as `root`:
+
+```bash
+$ ./scripts/setup-backups.sh
+```
+
+... will create a `pwikibackup` user with its home at `/home/pwikibackup`. Every week, a new database backup will be written to `/home/pwikibackup/backups/<backup date>.sql.xz`.
+
+This will also create a `/home/pwikibackup/backup` script that users may call over SSH to get the newest backup (this `tar`s up both the latest database backup and the whole MediaWiki uploaded files directory). `sshd`'s config file is set to make this user always run this command, such that backups will be output on stdout for any SSH connection. This lets other machines create backups by simply caling:
+
+```bash
+$ ssh pwikibackup@theportalwiki.com > "backup-$(date '+%Y-%m-%d').tar.xz"
+```
+
+Errors will be printed to stderr, and the status code may be reliably used to determine whether the backup was successful. To add users that may perform backups, add their public SSH keys to `resources/backup/users` and re-run `setup-backups.sh`.
+
 ### MariaDB container
 
 ```bash
@@ -57,7 +75,9 @@ $ docker build --tag=pwiki-mariadb images/pwiki-mariadb
 $ docker run --rm --detach --name=pwiki-mariadb --volume=/etc/pwiki/pwiki-secrets:/pwiki-secrets --volume=/var/lib/mysql-pwiki:/var/lib/mysql pwiki-mariadb
 ```
 
-### MariaDB backup
+### Manual MariaDB backups
+
+*You may skip this section if you used `setup-backups.sh`, as backups are already set up for you. This is about how to make database backups manually.*
 
 Database backups are LZMA-compressed SQL statements.
 
@@ -66,10 +86,8 @@ The `backup-database.sh` script will build a backup container, connect to the ru
 The script takes two arguments: the secrets directory, and the full path of the file to back up to.
 
 ```bash
-$ ./scripts/backup-database.sh /etc/pwiki/pwiki-secrets "/var/lib/mysql-pwiki-backups/$(date '+%Y-%m-%d').sql.xz"
+$ ./scripts/backup-database.sh /etc/pwiki/pwiki-secrets "/home/pwikibackup/database-backups/$(date '+%Y-%m-%d').sql.xz"
 ```
-
-A sample `crontab` entry to automate backups is provided in `crontab/root.crontab`.
 
 ### PHP-FPM application container
 

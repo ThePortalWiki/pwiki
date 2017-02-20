@@ -1,0 +1,69 @@
+#!/bin/bash
+
+set -euo pipefail
+
+DATABASE_BACKUPS_DIR="$HOME/database-backups"
+MAX_BACKUP_AGE_SECONDS=$((15 * 24 * 60 * 60))  # 15 days, a bit over 2 weeks.
+WEB_USER=pwiki
+IMAGES_DIR="$(eval echo "~$WEB_USER/www/w/images")"
+
+howOld() {
+	totalSecondsOld="$1"
+	if [ "$totalSecondsOld" -eq 0 ]; then
+		echo '<1s'
+		return 0
+	fi
+	secondsOld="$(expr "$totalSecondsOld" '%' 60)"
+	totalMinutesOld="$(expr "$totalSecondsOld" '/' 60)"
+	minutesOld="$(expr "$totalMinutesOld" '%' 60)"
+	totalHoursOld="$(expr "$totalMinutesOld" '/' 60)"
+	hoursOld="$(expr "$totalHoursOld" '%' 24)"
+	totalDaysOld="$(expr "$totalHoursOld" '/' 24)"
+
+	duration=''
+	if [ "$secondsOld" -gt 0 ]; then
+		duration="${secondsOld}s $duration"
+	fi
+	if [ "$minutesOld" -gt 0 ]; then
+		duration="${minutesOld}m $duration"
+	fi
+	if [ "$hoursOld" -gt 0 ]; then
+		duration="${hoursOld}h $duration"
+	fi
+	if [ "$totalDaysOld" -gt 0 ]; then
+		duration="${totalDaysOld}d $duration"
+	fi
+	echo "$duration" | sed -r 's/^ *| *$//g'
+}
+
+latestDatabaseBackup="$(ls -1t "$DATABASE_BACKUPS_DIR"/*.sql.xz | head -1)"
+if [ "$(echo "$latestDatabaseBackup" | wc -l)" -eq 0 ]; then
+	echo "Cannot find any database backup in database backup directory '$DATABASE_BACKUPS_DIR'." >&2
+	exit 1
+fi
+backupTimestamp="$(stat -c '%W' "$latestDatabaseBackup")"
+if [ "$backupTimestamp" -eq 0 ]; then
+	backupTimestamp="$(stat -c '%Y' "$latestDatabaseBackup")"
+fi
+currentTimestamp="$(date '+%s')"
+if [ "$currentTimestamp" -lt "$backupTimestamp" ]; then
+	echo "Database backup '$latestDatabaseBackup' was created in the future somehow." >&2
+	exit 1
+fi
+backupAgeSeconds="$(expr "$currentTimestamp" - "$backupTimestamp")"
+if [ "$backupAgeSeconds" -gt "$MAX_BACKUP_AGE_SECONDS" ]; then
+	echo "Latest database backup '$latestDatabaseBackup' was created $(howOld "$backupAgeSeconds") ago, which is older than the maximum allowed backup age of $(howOld "$MAX_BACKUP_AGE_SECONDS")." >&2
+	exit 1
+fi
+if ! ls "$IMAGES_DIR" &> /dev/null; then
+	echo "Cannot read images directory '$IMAGES_DIR'." >&2
+	exit 1
+fi
+echo "Selected database backup file: '$latestDatabaseBackup' ($(howOld "$backupAgeSeconds") old)." >&2
+echo 'Dumping backup tar file...' >&2
+
+tar --create --file=- --xz --one-file-system --exclude='*/thumb/*' --exclude='*/temp/*'  \
+  --directory="$(dirname "$latestDatabaseBackup")" "$(basename "$latestDatabaseBackup")" \
+  --directory="$(dirname "$IMAGES_DIR")"           "$(basename "$IMAGES_DIR")"
+
+echo "Backup complete." >&2
