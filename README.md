@@ -63,10 +63,14 @@ $ ./scripts/setup-backups.sh
 This will also create a `/home/pwikibackup/backup` script that users may call over SSH to get the newest backup (this `tar`s up both the latest database backup and the whole MediaWiki uploaded files directory). `sshd`'s config file is set to make this user always run this command, such that backups will be output on stdout for any SSH connection. This lets other machines create backups by simply caling:
 
 ```bash
-$ ssh pwikibackup@theportalwiki.com > "backup-$(date '+%Y-%m-%d').tar.xz"
+$ ssh pwikibackup@theportalwiki.com > "backup-$(date '+%Y-%m-%d').tar.xz.gpg"
 ```
 
 Errors will be printed to stderr, and the status code may be reliably used to determine whether the backup was successful. To add users that may perform backups, add their public SSH keys to `resources/backup/users` and re-run `setup-backups.sh`.
+
+#### Crypto details
+
+Backup files may be checked for integrity by checking for a valid GPG signature by the key at `resources/backups/signing-key.asc`. This signing key should not be used for any other purpose.
 
 ### MariaDB container
 

@@ -47,6 +47,7 @@ DATABASE_BACKUP_DIRECTORY="$BACKUP_HOME/database-backups"
 umask 077
 mkdir -p -m 700 "$DATABASE_BACKUP_DIRECTORY"
 cp -f "$backupResourcesDir/backup.sh" "$BACKUP_HOME/backup.sh"
+cp -f "$backupResourcesDir/signing-key.asc" "$BACKUP_HOME/signing-key.asc"
 mkdir -p -m 700 "$BACKUP_HOME/.ssh"
 cat "$backupResourcesDir/authorized_keys"/* > "$BACKUP_HOME/.ssh/authorized_keys"
 chmod 400 "$BACKUP_HOME/.ssh/authorized_keys"
