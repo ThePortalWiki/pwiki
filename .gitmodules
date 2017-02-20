@@ -31,3 +31,9 @@
 [submodule "extra/extensions/EmbedVideo"]
 	path = images/pwiki-app/extra/extensions/EmbedVideo
 	url = https://github.com/HydraWiki/mediawiki-embedvideo
+[submodule "resources/backups/secret-sharing"]
+	path = resources/backups/secret-sharing
+	url = https://github.com/ThePortalWiki/secret-sharing
+[submodule "resources/backups/python-utilitybelt"]
+	path = resources/backups/python-utilitybelt
+	url = https://github.com/ThePortalWiki/python-utilitybelt

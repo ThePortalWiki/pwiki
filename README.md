@@ -70,7 +70,19 @@ Errors will be printed to stderr, and the status code may be reliably used to de
 
 #### Crypto details
 
-Backup files may be checked for integrity by checking for a valid GPG signature by the key at `resources/backups/signing-key.asc`. This signing key should not be used for any other purpose.
+Backup files may be checked for integrity by checking for a valid GPG signature by the passphrase-less signing key at `resources/backups/signing-key.asc`. This signing key should not be used for any other purpose.
+
+Backups are encrypted with a secret key at `resources/backups/encryption-key.asc`. Its passphrase is split across multiple Portal Wiki staff members, using [Shamir's Secret Sharing Scheme](https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing). The particular implementation in use is available at [ThePortalWiki/secret-sharing](https://github.com/ThePortalWiki/secret-sharing). The `scripts/generate-backup-encryption-key.sh` shows how the key was generated.
+
+The key passphrase is split according to a 4:9001 secret-sharing scheme. This means that there are 9001 passphrase fragments out there, and any combination of 4 of them is sufficient to reconstruct the overall passphrase. The 9001st fragment is publicly checked into this repository at `resources/backups/encryption-key.passphrase.9001.ssss-fragment`, effectively rendering making the scheme equivalent to a 3:9000 secret-sharing scheme (it is checked there to provide an example fragment format). Staff members are given 1 passphrase fragment when they become staff.
+
+Given 4 fragment files `encryption-key.passphrase.NNNN.ssss-fragment`, here is how to recover the passphrase:
+
+```bash
+$ ./scripts/recover-backup-encryption-key-passphrase.sh /path/to/encryption-key.passphrase.*.ssss-fragment
+```
+
+The 9001 passphrase fragments are also stored in this repo at `resources/backups/encryption-key-fragments.tar.xz.gpg`. This is a tar file containing all 9001 key fragments, signed and encrypted with the encryption key itself. It is there such that other fragments may be distributed to newer members without needing to re-generate passphrase fragments.
 
 ### MariaDB container
 
