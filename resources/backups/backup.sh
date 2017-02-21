@@ -76,8 +76,11 @@ tar --create --file=- --xz --one-file-system                                    
   --directory="$(dirname "$latestDatabaseBackup")" "$(basename "$latestDatabaseBackup")" \
   --directory="$(dirname "$IMAGES_DIR")"           "$(basename "$IMAGES_DIR")" |         \
 gpg --batch --quiet                                                                      \
-  --encrypt --recipient="$BACKUP_GNUPG_ENCRYPTION_KEY" --trust-model=always              \
+  --sign --local-user="$BACKUP_GNUPG_SIGNING_KEY"                                        \
+  --encrypt --recipient="$BACKUP_GNUPG_ENCRYPTION_KEY" --trust-model=always |            \
+gpg --batch --quiet                                                                      \
   --sign --local-user="$BACKUP_GNUPG_SIGNING_KEY"
+
 echo 'Backup file streamed successfully.' >&2
 
 rm -rf --one-file-system "$tmpDir"
