@@ -69,9 +69,8 @@ EOF
 chmod 555 /etc/cron.weekly/pwiki-database-backup.sh /etc/cron.weekly/pwiki-database-backup-cleanup.sh
 
 tmpSSHDConfig="$SSHD_CONFIG.pwiki-tmp"
-cat "$SSHD_CONFIG" | sed -r 's/.*#.*MANAGED_BY_PWIKI.*$//g' > "$tmpSSHDConfig"
+cat "$SSHD_CONFIG" | sed -r '/.*#.*MANAGED_BY_PWIKI.*$/d' > "$tmpSSHDConfig"
 cat << EOF >> "$tmpSSHDConfig"
-
 # The following section is managed by PWiki. Do not edit. # MANAGED_BY_PWIKI
 Match user                          $BACKUP_USER          # MANAGED_BY_PWIKI
     PasswordAuthentication          no                    # MANAGED_BY_PWIKI
