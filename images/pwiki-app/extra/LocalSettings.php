@@ -369,9 +369,6 @@ $randomHash
   $wgGroupPermissions['*']['interwiki'] = false;
   $wgGroupPermissions['sysop']['interwiki'] = true;
 
-  if (function_exists('wfLoadExtension')) { wfLoadExtension('SecureHTML'); } else { require_once( "$IP/extensions/SecureHTML/SecureHTML.php" ); }
-  $wgGroupPermissions['coding']['coding'] = true;
-
   # No patch exists for current MediaWiki; update please?
   # https://github.com/ThePortalWiki/RevQuery
   # if (function_exists('wfLoadExtension')) { wfLoadExtension('RevQuery'); } else { require_once( "$IP/extensions/RevQuery/RevQuery.php" ); }

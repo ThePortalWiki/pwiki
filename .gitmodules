@@ -16,9 +16,6 @@
 [submodule "extra/extensions/MobileFrontend"]
 	path = images/pwiki-app/extra/extensions/MobileFrontend
 	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/MobileFrontend
-[submodule "extra/extensions/SecureHTML"]
-	path = images/pwiki-app/extra/extensions/SecureHTML
-	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SecureHTML
 [submodule "extra/extensions/RedditThumbnail"]
 	path = images/pwiki-app/extra/extensions/RedditThumbnail
 	url = https://github.com/ThePortalWiki/RedditThumbnail
