@@ -107,9 +107,25 @@ The script takes two arguments: the secrets directory, and the full path of the 
 $ ./scripts/backup-database.sh /etc/pwiki/pwiki-secrets "/home/pwikibackup/database-backups/$(date '+%Y-%m-%d').sql.xz"
 ```
 
-### PHP-FPM application container
+### MediaWiki application container
 
-TODO
+The main containerm `pwiki-app`, is based off [Docker's official `php` container](https://hub.docker.com/_/php/) running in `php-fpm` mode. The MediaWiki installation is stripped down to only its PHP files to minimize image size, and nginx only forwards requests for `*.php` to it. It is automatically built and deployed by the `scripts/upgrade-mediawiki.sh` script documented below.
+
+It also bundles some more functionality to make MediaWiki work properly:
+
+* `imagemagick` for MediaWiki's ImageMagick resizing support
+* `msmtp` to send email through Gmail via SMTP
+* TODO: Add some opcode caching thing as well
+
+Container build arguments (these are typically automatically passed in by `scripts/upgrade-mediawiki.sh`):
+
+* `WIKI_UIDGID`: A numeric `uid:gid` pair which will be used for the user running `php-fpm`.
+* `MEDIAWIKI_RELEASE`: The full URL of a MediaWiki release tarball.
+
+It requires two mounts:
+
+* `/pwiki-secrets`: Used to get database and SMTP credentials.
+* `/home/pwiki/www/w/images/`: Used to drop uploaded files upon upload. This needs to be writable by the user running inside the container, which has its UID/GID defined by the container's build arguments.
 
 ## Upgrading MediaWiki
 
