@@ -45,7 +45,7 @@ if [ "$1" == unmount ]; then
 		echo "Mountpoint '$MOUNTPOINT' is empty." >&2
 		exit 1
 	fi
-	fusermount -u -z "$MOUNTPOINT"
+	fusermount -u "$MOUNTPOINT"
 	rmdir "$MOUNTPOINT"
 	exit 0
 fi
