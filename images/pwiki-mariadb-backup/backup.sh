@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
 if [ -e /pwiki-secrets/no-volume -o -e /backups/no-volume ]; then
 	echo 'Volumes not mounted.' >&2

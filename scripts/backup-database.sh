@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -euxo pipefail
 
 repoDir="$(dirname "${BASH_SOURCE[0]}")/.."
 imagesDir="$repoDir/images"

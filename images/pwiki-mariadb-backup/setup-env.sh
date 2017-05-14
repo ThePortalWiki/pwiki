@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
 BACKUP_UID="$(echo "$BACKUP_UIDGID" | cut -d: -f1)"
 BACKUP_GID="$(echo "$BACKUP_UIDGID" | cut -d: -f2)"
