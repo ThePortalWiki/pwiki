@@ -57,12 +57,12 @@ ln -fs backup.sh "$BACKUP_HOME/backup"
 chmod 500 "$BACKUP_HOME"
 chown -R "$BACKUP_USER:$BACKUP_USER" "$BACKUP_HOME"
 cat << EOF > /etc/cron.weekly/pwiki-database-backup.sh
-#!/usr/bin/env bash
+#!/usr/bin/bash
 
 exec cronic bash -c '"$repoDir/scripts/backup-database.sh" "$secretsDir" "$DATABASE_BACKUP_DIRECTORY/pwiki-\$(date '+%Y-%m-%d').sql.xz"'
 EOF
 cat << EOF > /etc/cron.weekly/pwiki-database-backup-cleanup.sh
-#!/usr/bin/env bash
+#!/usr/bin/bash
 
 exec cronic find '$DATABASE_BACKUP_DIRECTORY' -type f -mtime +30 -delete
 EOF
