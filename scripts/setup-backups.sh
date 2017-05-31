@@ -66,7 +66,7 @@ cat << EOF > /etc/cron.weekly/pwiki-database-backup-cleanup.sh
 
 exec cronic find '$DATABASE_BACKUP_DIRECTORY' -type f -mtime +30 -delete
 EOF
-chmod 555 /etc/cron.weekly/pwiki-database-backup.sh /etc/cron.weekly/pwiki-database-backup-cleanup.sh
+chmod 500 /etc/cron.weekly/pwiki-database-backup.sh /etc/cron.weekly/pwiki-database-backup-cleanup.sh
 
 tmpSSHDConfig="$SSHD_CONFIG.pwiki-tmp"
 cat "$SSHD_CONFIG" | sed -r '/.*#.*MANAGED_BY_PWIKI.*$/d' > "$tmpSSHDConfig"
