@@ -78,6 +78,7 @@ rm -rf --one-file-system "$BUILD_DIR"
 mkdir --mode=700 "$BUILD_DIR" "$STAGING_DIR"
 export GNUPGHOME="$BUILD_DIR/gnupg_tmp"
 mkdir --mode=700 "$GNUPGHOME"
+cat "$IMAGES_DIR/$CONTAINER_APP_NAME/extra-keys.asc" | gpg --import
 wget -O- "$GNUPG_KEYS" | gpg --import
 pushd "$BUILD_DIR"
 	for release in "${allReleases[@]}"; do

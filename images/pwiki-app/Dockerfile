@@ -5,14 +5,14 @@ ARG REBUILD=1
 RUN apt-get update && apt-get upgrade -y
 
 ARG WIKI_UIDGID=1000:1000
-COPY setup-wiki.sh /setup-wiki.sh
+COPY setup-wiki.sh /
 RUN chmod 555 /setup-wiki.sh && /setup-wiki.sh && rm /setup-wiki.sh
 
 ARG MEDIAWIKI_RELEASE
 COPY extra /extra
 RUN chown -R pwiki:pwiki /extra
-COPY install-mediawiki.sh /install-mediawiki.sh
-RUN chmod 555 /install-mediawiki.sh && sudo -u pwiki --preserve-env --set-home /install-mediawiki.sh && rm /install-mediawiki.sh
+COPY install-mediawiki.sh extra-keys.asc /
+RUN chmod 555 /install-mediawiki.sh && sudo -u pwiki --preserve-env --set-home /install-mediawiki.sh && rm /install-mediawiki.sh /extra-keys.asc
 RUN rm -rf --one-file-system /extra
 
 # Volume handling.
