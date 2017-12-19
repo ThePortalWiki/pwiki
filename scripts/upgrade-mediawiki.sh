@@ -117,10 +117,16 @@ run_app() {
 }
 
 # Determine currently-running release.
-OLD_TAG="$(docker inspect --format='{{.Config.Image}}' "$CONTAINER_APP_NAME")"
+noRevertIsOK=''
+OLD_TAG="$(docker inspect --format='{{.Config.Image}}' "$CONTAINER_APP_NAME" || true)"
 if [ -z "$OLD_TAG" ]; then
 	echo "Cannot determine image tag of running '$CONTAINER_APP_NAME' container." >&2
-	exit 1
+	echo -n 'Continue without revert capability? [y/N] '
+	read noRevertIsOK
+	noRevertIsOK="$(echo "$noRevertIsOK" | tr '[:upper:]' '[:lower:]')"
+	if [ "$noRevertIsOK" != 'y' ]; then
+		exit 1
+	fi
 fi
 
 # Swap releases.
@@ -142,17 +148,19 @@ revert_mw() {
 	rm -rf --one-file-system "$MEDIAWIKI_TESTROOT"
 }
 
-# Manual testing of new release.
-echo "Please try out the new release at '$ROOT_URL'."
-releaseOK='invalid'
-while [ "$releaseOK" != 'y' -a "$releaseOK" != 'n' -a -n "$releaseOK" ]; do
-	echo -n 'Good to upgrade? [y/N] '
-	read releaseOK
-	releaseOK="$(echo "$releaseOK" | tr '[:upper:]' '[:lower:]')"
-done
-if [ "$releaseOK" != 'y' ]; then
-	revert_mw
-	exit 0
+if [ "$noRevertIsOK" != 'y' ]; then
+	# Manual testing of new release.
+	echo "Please try out the new release at '$ROOT_URL'."
+	releaseOK='invalid'
+	while [ "$releaseOK" != 'y' -a "$releaseOK" != 'n' -a -n "$releaseOK" ]; do
+		echo -n 'Good to upgrade? [y/N] '
+		read releaseOK
+		releaseOK="$(echo "$releaseOK" | tr '[:upper:]' '[:lower:]')"
+	done
+	if [ "$releaseOK" != 'y' ]; then
+		revert_mw
+		exit 0
+	fi
 fi
 echo 'Release OK. Proceeding with upgrade.'
 rm -rf --one-file-system "$MEDIAWIKI_PRODROOT_BACKUP"
