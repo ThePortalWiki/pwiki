@@ -317,9 +317,8 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
   $randomHashPart1 = substr($randomHash, 0, $randomHashSplitIndex);
   $randomJunk = substr(sha1(strval(rand())), rand(1, 4), rand(12, 16));
   $randomHashPart2 = substr($randomHash, $randomHashSplitIndex);
-  $wgCaptchaQuestions[] = array( 'question' => '(Anti-spam) Please enter the following characters into the textfield (do not copy/paste, it will not paste the right thing): <code>'.$randomHashPart1.'<span style="display: inline-block; width: 0px; opacity: 0; overflow: hidden">'.$randomJunk.'</span>'.$randomHashPart2.'</code>', 'answer' => 
-$randomHash 
-);
+  # $wgGroupPermissions['*']['createaccount'] = false; # Uncomment to disable account creation.
+  $wgCaptchaQuestions[] = array( 'question' => '(Anti-spam) Please enter the following characters into the textfield (do not copy/paste, it will not paste the right thing): <span></span><span style="font: monospace;">'.$randomHashPart1.'<span style="display: inline-block; width: 1px; opacity: 0.01;">'.$randomJunk.'</span>'.$randomHashPart2.'</span>', 'answer' => $randomHash );
 
   if (function_exists('wfLoadExtension')) { wfLoadExtension('EmbedVideo'); } else { require_once( "$IP/extensions/EmbedVideo/EmbedVideo.php" ); }
 
