@@ -140,8 +140,8 @@ $wgDefaultSkin = 'vector';
 ## License and Creative Commons licenses are supported so far.
 $wgEnableCreativeCommonsRdf = true;
 $wgRightsPage = ""; # Set to the title of a wiki page that describes your license/copyright
-$wgRightsUrl = "https://creativecommons.org/licenses/by/3.0/";
-$wgRightsText = "Attribution 3.0 Unported (CC BY 3.0)";
+$wgRightsUrl = "https://creativecommons.org/licenses/by/4.0/";
+$wgRightsText = "Attribution 4.0 International (CC BY 4.0)";
 $wgRightsIcon = "/w/images/cc.png";
 # $wgRightsCode = "[license_code]"; # Not yet used
 
