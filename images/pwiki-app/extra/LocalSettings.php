@@ -7,6 +7,7 @@ if(isset($_SERVER['HTTP_HOST']) && substr_compare($_SERVER['HTTP_HOST'], '.net',
 	die();
 }
 
+set_time_limit(120);
 # ----- DEBUG SETTINGS
 #set_time_limit(0);
 #error_reporting(E_ALL);
