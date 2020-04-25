@@ -42,6 +42,7 @@ $wgDBpassword = 'something';
 $wgSecretKey = 'something';
 $wgReCaptchaPublicKey = 'something';
 $wgReCaptchaPrivateKey = 'something';
+$smtpEmailPassword = 'something';
 ```
 
 Put something like this in `/etc/pwiki/pwiki-secrets/smtp-password`:

@@ -69,9 +69,6 @@ $wgStylePath        = "$wgScriptPath/skins";
 $wgEnableEmail      = true;
 $wgEnableUserEmail  = true; # UPO
 
-$wgEmergencyContact = "portal2wiki@gmail.com";
-$wgPasswordSender = "portal2wiki@gmail.com";
-
 $wgEnotifUserTalk = true; # UPO
 $wgEnotifWatchlist = true; # UPO
 $wgEmailAuthentication = true;
@@ -155,6 +152,20 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
  
 # MANUAL ADDITIONS TO LOCALSETTINGS
 
+  require_once( '/home/pwiki/www-private/mediawiki-secrets.php' );
+
+  $wgEmergencyContact = "portal2wiki@gmail.com";
+  $wgPasswordSender = "portal2wiki@gmail.com";
+  $wgSMTP = [
+      'host' => 'ssl://smtp.gmail.com',
+      'IDHost' => 'gmail.com',
+      'localhost' => 'theportalwiki.com',
+      'port' => 465,
+      'username' => 'portal2wiki@gmail.com',
+      'password' => $smtpEmailPassword,
+      'auth' => true
+  ];
+
   # Load Vector skin. MediaWiki 1.24+ requires manual listing of skins.
   if(function_exists('wfLoadSkin')) {
     # MediaWiki 1.25+
@@ -163,8 +174,6 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
     # MediaWiki 1.24
     require_once("$IP/skins/Vector/Vector.php");
   }
-
-  require_once( '/home/pwiki/www-private/mediawiki-secrets.php' );
 
   # Set time listed in signatures to UTC:
   $wgLocaltimezone = 'UTC';

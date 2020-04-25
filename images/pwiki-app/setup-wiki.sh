@@ -5,6 +5,8 @@ set -x
 apt-get install -y sudo gnupg2 wget curl libcurl4-openssl-dev libmcrypt-dev libpng-dev libxml2-dev imagemagick psutils msmtp
 
 docker-php-ext-install -j"$(nproc)" curl dom fileinfo gd iconv json mbstring mcrypt mysql session xml zip
+pear install mail
+pear install net_smtp
 
 # TODO: Also add APC/xcache.
 
@@ -52,14 +54,18 @@ tls_trust_file   /etc/ssl/certs/ca-certificates.crt
 
 account        portal2wiki
 host           smtp.gmail.com
-port           587
+port           465
 from           portal2wiki@gmail.com
 user           portal2wiki@gmail.com
 passwordeval   "cat /home/pwiki/www-private/smtp-password"
 
 account default : portal2wiki
 EOF
-echo "sendmail_path = \"$(which msmtp) -C $MSMTP_CONFIG -t\"" > "$PHP_SENDMAIL_CONFIG"
+
+# msmtp isn't actually used by PHP anymore, so the above config is only useful
+# for manual msmtp invocations from the command-line to test email sending.
+# Uncommenting the following line will make PHP use SMTP:
+# echo "sendmail_path = \"$(which msmtp) -C $MSMTP_CONFIG -t\"" > "$PHP_SENDMAIL_CONFIG"
 
 chmod -R g-rwx,o-rwx ~pwiki
 chown -R pwiki:pwiki ~pwiki
