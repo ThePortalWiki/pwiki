@@ -1,0 +1,6 @@
+mediawiki_release_url: 'https://releases.wikimedia.org/mediawiki/1.23/mediawiki-1.23.15.tar.gz'
+pwiki_gid: 18374
+pwiki_uid: 18374
+pwikibackup_uid: 18375
+pwikibot_uid: 18376
+staff_email: staff@theportalwiki.com

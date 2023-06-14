@@ -2,9 +2,11 @@
 
 set -euxo pipefail
 
-WEBROOT="$HOME/www"
-IMAGES_ROOT="$HOME/www-private/pwiki-images"
-FUSECOMPRESS="$HOME/fusecompress/install/bin/fusecompress"
+WEB_USER=pwiki
+WEB_GROUP=pwiki
+WEB_HOME="$(eval echo "~$WEB_USER")"
+WEBROOT="$WEB_HOME/www"
+IMAGES_ROOT="$WEB_HOME/www-private/images"
 
 if [ ! -d "$WEBROOT" ]; then
 	echo "Cannot find MediaWiki root '$WEBROOT'." >&2
@@ -13,11 +15,6 @@ fi
 
 if [ ! -d "$IMAGES_ROOT" ]; then
 	echo "Cannot find images root '$IMAGES_ROOT'." >&2
-	exit 1
-fi
-
-if [ ! -x "$FUSECOMPRESS" ]; then
-	echo "Cannot find fusecompress binary '$FUSECOMPRESS'." >&2
 	exit 1
 fi
 
@@ -31,12 +28,15 @@ MOUNTPOINT="$WEBROOT/w/images"
 if [ "$1" == mount ]; then
 	if [ ! -d "$MOUNTPOINT" ]; then
 		mkdir --mode=700 "$MOUNTPOINT"
+		chown "$WEB_USER:$WEB_GROUP" "$MOUNTPOINT"
 	fi
 	if [ "$(ls -1 "$MOUNTPOINT" | wc -l)" -ne 0 ]; then
 		echo "Mountpoint '$MOUNTPOINT' is not empty." >&2
 		exit 1
 	fi
-	"$FUSECOMPRESS" -o allow_other,umask=0002 -c lzma -l 9 "$IMAGES_ROOT" "$MOUNTPOINT"
+	chown -R "$WEB_USER:$WEB_GROUP" "$IMAGES_ROOT"
+	chmod -R o+rwX,g+rwX,o-w "$IMAGES_ROOT"
+	mount --bind --make-rprivate -o allow_other,umask=0002 "$IMAGES_ROOT" "$MOUNTPOINT"
 	exit 0
 fi
 
@@ -45,7 +45,7 @@ if [ "$1" == unmount ]; then
 		echo "Mountpoint '$MOUNTPOINT' is empty." >&2
 		exit 1
 	fi
-	fusermount -u "$MOUNTPOINT"
+	umount -l -R "$MOUNTPOINT"
 	rmdir "$MOUNTPOINT"
 	exit 0
 fi

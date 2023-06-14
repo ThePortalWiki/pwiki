@@ -1,4 +1,4 @@
-FROM pwiki-mariadb
+FROM pwiki-mariadb:pwiki-mariadb
 
 ARG BACKUP_UIDGID
 

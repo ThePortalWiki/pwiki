@@ -13,7 +13,7 @@ CONTAINER_APP_NAME=pwiki-app
 CONTAINER_DATABASE_NAME=pwiki-mariadb
 IMAGES_DIR="$scriptDir/../images"
 EXTRA_ROOT="$scriptDir/../images/$CONTAINER_APP_NAME/extra"
-FUSECOMPRESS_MOUNT="$scriptDir/fusecompress-mount.sh"
+IMAGE_MOUNT="$scriptDir/image-mount.sh"
 MEDIAWIKI_USER=pwiki
 MEDIAWIKI_USER_HOME="$(eval echo "~$MEDIAWIKI_USER")"
 WEBROOT="$MEDIAWIKI_USER_HOME/www"
@@ -24,7 +24,8 @@ MEDIAWIKI_PRODROOT="$WEBROOT/w"
 MEDIAWIKI_PRODROOT_BACKUP="$WEBROOT_PRIVATE/w.old"
 MEDIAWIKI_TESTROOT="$WEBROOT_PRIVATE/w.new"
 MEDIAWIKI_IMAGES_MOUNTPOINT="$MEDIAWIKI_PRODROOT/images"
-SECRETS_DIR=/etc/pwiki/pwiki-secrets
+ETC_DIR=/etc/pwiki
+SECRETS_DIR="$ETC_DIR/pwiki-secrets"
 ROOT_URL='https://theportalwiki.com'
 GNUPG_KEYS='https://www.mediawiki.org/keys/keys.txt'
 PHP_FPM_BIND_HOSTPORT=127.0.0.1:3777
@@ -39,8 +40,21 @@ if [ ! -d "$EXTRA_ROOT" ]; then
 	exit 1
 fi
 
-if [ ! "$#" -eq 1 ]; then
-	echo "Usage: $0 https://releases.wikimedia.org/mediawiki/x.xx/mediawiki-x.xx.xx.tar.gz" >&2
+if [ "$#" -lt 1 ]; then
+	echo "Usage: $0 [--batch] https://releases.wikimedia.org/mediawiki/x.xx/mediawiki-x.xx.xx.tar.gz" >&2
+	exit 1
+fi
+batchMode=false
+currentRelease=''
+for arg; do
+	if [[ "$arg" == '--batch' ]]; then
+		batchMode=true
+	else
+		currentRelease="$arg"
+	fi
+done
+if [[ -z "$currentRelease" ]]; then
+	echo "Must specify MediaWiki release." >&2
 	exit 1
 fi
 
@@ -48,7 +62,6 @@ fi
 # For some reason, mediawiki-x.xx.(something more than 0).tar.gz does not always include
 # things that the point-0 release does (extensions), so we just build a kludge from all
 # point releases onwards to make sure we don't miss anything.
-currentRelease="$1"
 if ! basename "$currentRelease" | grep -qP '^mediawiki-[0-9]+\.[0-9]+\.([0-9]+)\.tar\.gz$'; then
 	echo "Cannot parse release number from '$currentRelease'." >&2
 	exit 1
@@ -76,6 +89,7 @@ docker build --build-arg="MEDIAWIKI_RELEASE=$currentRelease" --build-arg="WIKI_U
 
 rm -rf --one-file-system "$BUILD_DIR"
 mkdir --mode=700 "$BUILD_DIR" "$STAGING_DIR"
+chown -R pwiki:pwiki "$BUILD_DIR" "$STAGING_DIR"
 export GNUPGHOME="$BUILD_DIR/gnupg_tmp"
 mkdir --mode=700 "$GNUPGHOME"
 cat "$IMAGES_DIR/$CONTAINER_APP_NAME/extra-keys.asc" | gpg --import
@@ -114,7 +128,7 @@ chmod -R u+rwX,g+rwX,o-rwx "$MEDIAWIKI_TESTROOT"
 
 run_app() {
 	echo "Running container app with tag '$1'." >&2
-	docker run --detach --name="$CONTAINER_APP_NAME" --link="$CONTAINER_DATABASE_NAME:$CONTAINER_DATABASE_NAME" --volume="$SECRETS_DIR:/pwiki-secrets" --volume="$MEDIAWIKI_IMAGES_MOUNTPOINT:$MEDIAWIKI_IMAGES_MOUNTPOINT" --publish="$PHP_FPM_BIND_HOSTPORT:9000" "$1"
+	docker run --detach --name="$CONTAINER_APP_NAME" --link="$CONTAINER_DATABASE_NAME:$CONTAINER_DATABASE_NAME" --volume="$ETC_DIR:/pwiki" --volume="$SECRETS_DIR:/pwiki-secrets" --volume="$MEDIAWIKI_IMAGES_MOUNTPOINT:$MEDIAWIKI_IMAGES_MOUNTPOINT" --publish="$PHP_FPM_BIND_HOSTPORT:9000" "$1"
 }
 
 # Determine currently-running release.
@@ -122,46 +136,55 @@ noRevertIsOK=''
 OLD_TAG="$(docker inspect --format='{{.Config.Image}}' "$CONTAINER_APP_NAME" || true)"
 if [ -z "$OLD_TAG" ]; then
 	echo "Cannot determine image tag of running '$CONTAINER_APP_NAME' container." >&2
-	echo -n 'Continue without revert capability? [y/N] '
-	read noRevertIsOK
-	noRevertIsOK="$(echo "$noRevertIsOK" | tr '[:upper:]' '[:lower:]')"
-	if [ "$noRevertIsOK" != 'y' ]; then
-		exit 1
+	if [[ "$batchMode" == true ]]; then
+		echo 'Continuing anyway because of batch mode.' >&2
+		noRevertIsOK='y'
+	else
+		echo -n 'Continue without revert capability? [y/N] '
+		read noRevertIsOK
+		noRevertIsOK="$(echo "$noRevertIsOK" | tr '[:upper:]' '[:lower:]')"
+		if [ "$noRevertIsOK" != 'y' ]; then
+			exit 1
+		fi
 	fi
 fi
 
 # Swap releases.
 docker rm -f "$CONTAINER_APP_NAME" || true
-sudo -u "$MEDIAWIKI_USER" "$FUSECOMPRESS_MOUNT" unmount || true
+"$IMAGE_MOUNT" unmount || true
 mv "$MEDIAWIKI_PRODROOT" "$MEDIAWIKI_PRODROOT_BACKUP"
 mv "$MEDIAWIKI_TESTROOT" "$MEDIAWIKI_PRODROOT"
-sudo -u "$MEDIAWIKI_USER" "$FUSECOMPRESS_MOUNT" mount
+"$IMAGE_MOUNT" mount
 run_app "$CONTAINER_APP_NAME:$currentReleaseTag"
 
 revert_mw() {
 	echo 'Reverting release.'
 	docker rm -f "$CONTAINER_APP_NAME" || true
-	sudo -u "$MEDIAWIKI_USER" "$FUSECOMPRESS_MOUNT" unmount
+	"$IMAGE_MOUNT" unmount
 	mv "$MEDIAWIKI_PRODROOT" "$MEDIAWIKI_TESTROOT"
 	mv "$MEDIAWIKI_PRODROOT_BACKUP" "$MEDIAWIKI_PRODROOT"
-	sudo -u "$MEDIAWIKI_USER" "$FUSECOMPRESS_MOUNT" mount
+	"$IMAGE_MOUNT" mount
 	run_app "$OLD_TAG"
 	rm -rf --one-file-system "$MEDIAWIKI_TESTROOT"
 }
 
-if [ "$noRevertIsOK" != 'y' ]; then
-	# Manual testing of new release.
-	echo "Please try out the new release at '$ROOT_URL'."
-	releaseOK='invalid'
-	while [ "$releaseOK" != 'y' -a "$releaseOK" != 'n' -a -n "$releaseOK" ]; do
-		echo -n 'Good to upgrade? [y/N] '
-		read releaseOK
-		releaseOK="$(echo "$releaseOK" | tr '[:upper:]' '[:lower:]')"
-	done
-	if [ "$releaseOK" != 'y' ]; then
-		revert_mw
-		exit 0
+if [[ "$batchMode" == true ]]; then
+	echo "Setup complete: $ROOT_URL"
+else
+	if [ "$noRevertIsOK" != 'y' ]; then
+		# Manual testing of new release.
+		echo "Please try out the new release at '$ROOT_URL'."
+		releaseOK='invalid'
+		while [ "$releaseOK" != 'y' -a "$releaseOK" != 'n' -a -n "$releaseOK" ]; do
+			echo -n 'Good to upgrade? [y/N] '
+			read releaseOK
+			releaseOK="$(echo "$releaseOK" | tr '[:upper:]' '[:lower:]')"
+		done
+		if [ "$releaseOK" != 'y' ]; then
+			revert_mw
+			exit 0
+		fi
 	fi
+	echo 'Release OK. Proceeding with upgrade.'
 fi
-echo 'Release OK. Proceeding with upgrade.'
 rm -rf --one-file-system "$MEDIAWIKI_PRODROOT_BACKUP"

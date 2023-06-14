@@ -1,0 +1,297 @@
+- name: Upgrade archlinux-keyring
+  community.general.pacman:
+    update_cache: yes
+    name: archlinux-keyring
+    state: latest
+- name: Upgrade all packages
+  community.general.pacman:
+    update_cache: yes
+    upgrade: yes
+  register: system_upgrade
+- name: 'Reboot if any package was upgraded (retry playbook if this step fails)'
+  when: system_upgrade.changed
+  ansible.builtin.command:
+    argv:
+      - reboot
+- name: Install packages
+  ansible.builtin.package:
+    name:
+      - curl
+      - python
+      - python2
+      - sudo
+      - screen
+      - htop
+      - git
+      - rsync
+      - wget
+      - gnupg
+      - openssl
+      - nginx
+      - certbot
+      - certbot-nginx
+      - cronie
+      - docker
+      - python-docker
+  register: packages
+- name: Run Docker
+  ansible.builtin.systemd:
+    name: docker.service
+    daemon_reload: "{{ packages.changed }}"
+    enabled: yes
+    state: "{{ 'restarted' if packages.changed else 'started' }}"
+- name: Create pwiki group
+  ansible.builtin.group:
+    name: pwiki
+    gid: "{{ pwiki_gid }}"
+- name: Create users
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    group: pwiki
+    uid: "{{ item.uid }}"
+    shell: /bin/bash
+    home: "/home/{{ item.name }}"
+    create_home: true
+  loop:
+    - {name: 'pwiki', uid: "{{ pwiki_uid }}"}
+    - {name: 'pwikibackup', uid: "{{ pwikibackup_uid }}"}
+    - {name: 'pwikibot', uid: "{{ pwikibot_uid }}"}
+- name: Add nginx user to pwiki group
+  ansible.builtin.user:
+    name: http
+    groups: pwiki
+    append: yes
+- name: Create www subdirectories
+  ansible.builtin.file:
+    state: directory
+    path: "{{ item }}"
+    owner: pwiki
+    group: pwiki
+    mode: '0771'
+  loop:
+    - /home/pwiki
+    - /home/pwiki/www
+    - /home/pwiki/www-private
+    - /home/pwiki/www-private/images
+    - /home/pwiki/www/w
+    - /home/pwiki/www/w/images
+- name: Create root directories
+  ansible.builtin.file:
+    state: directory
+    path: "{{ item }}"
+    owner: root
+    group: root
+    mode: '0755'
+  loop:
+    - /etc/pwiki
+    - /etc/pwiki/pwiki-secrets
+    - /var/lib/mysql-pwiki
+- name: Create domain file
+  ansible.builtin.copy:
+    content: "{{ pwiki_domain }}"
+    dest: /etc/pwiki/pwiki.domain
+    owner: root
+    group: root
+    mode: '0644'
+- name: Clone repository contents
+  ansible.posix.synchronize:
+    src: "{{ role_path }}/../../../../"
+    dest: /home/pwiki/pwiki
+    recursive: yes
+    rsync_opts:
+      - "--chown={{ pwiki_uid }}:{{ pwiki_gid }}"
+  register: repo
+- name: Check pre-existence of backup file
+  stat:
+    path: /etc/pwiki/pwiki-backup.tar.xz
+  register: backup_file
+- name: Import secrets from backup if necessary
+  when: backup_file.stat.exists
+  ansible.builtin.shell:
+    creates: /etc/pwiki/pwiki-secrets/secrets.sh
+    cmd: 'for f in dbinfo.sh mediawiki-secrets.php smtp-password botConfig.py; do rm /etc/pwiki/pwiki-secrets/$f &>/dev/null || true; done; tar -axf /etc/pwiki/pwiki-backup.tar.xz secrets.sh -O > /etc/pwiki/pwiki-secrets/secrets.sh'
+- name: Check existence of secrets file
+  stat:
+    path: /etc/pwiki/pwiki-secrets/secrets.sh
+  register: secrets_file
+- name: Ensure secrets file exists
+  when: not secrets_file.stat.exists
+  fail:
+    msg: 'Secrets file not properly restored. Please place a backup file at /etc/pwiki/pwiki-backup.tar.xz or manually populate /etc/pwiki/pwiki-secrets/secrets.sh according to the README.'
+- name: Ensure secrets file can be read by backup user
+  ansible.builtin.file:
+    state: file
+    path: /etc/pwiki/pwiki-secrets/secrets.sh
+    owner: pwikibackup
+    group: root
+    mode: '0600'
+- name: Generate downstream secrets files
+  ansible.builtin.command:
+    creates: "/etc/pwiki/pwiki-secrets/{{ item }}"
+    argv:
+      - /home/pwiki/pwiki/scripts/generate-secrets-file.sh
+      - "{{ item }}"
+  loop:
+    - dbinfo.sh
+    - mediawiki-secrets.php
+    - smtp-password
+    - botConfig.py
+- name: Build pwiki-mariadb Docker image
+  community.docker.docker_image:
+    name: pwiki-mariadb
+    source: build
+    build:
+      path: /home/pwiki/pwiki/images/pwiki-mariadb
+    tag: pwiki-mariadb
+  register: mariadb_image
+- name: Run database container
+  community.docker.docker_container:
+    name: pwiki-mariadb
+    container_default_behavior: no_defaults
+    state: started
+    recreate: "{{ mariadb_image.changed }}"
+    detach: yes
+    init: no
+    interactive: no
+    privileged: no
+    read_only: no
+    tty: no
+    restart_policy: unless-stopped
+    image: pwiki-mariadb:pwiki-mariadb
+    volumes:
+      - /etc/pwiki/pwiki-secrets:/pwiki-secrets:ro
+      - /var/lib/mysql-pwiki:/var/lib/mysql:rw
+  register: database_container
+- name: Restore database and images from backup file if present
+  ansible.builtin.command:
+    removes: /etc/pwiki/pwiki-backup.tar.xz
+    argv:
+      - /home/pwiki/pwiki/scripts/restore-from-backup.sh
+      - /etc/pwiki/pwiki-backup.tar.xz
+- name: Check existence of database backup restoration
+  stat:
+    path: /var/lib/mysql-pwiki/portalwiki
+  register: dbbackup
+- name: Check existence of image backup restoration
+  stat:
+    path: /home/pwiki/www-private/images/cc.png
+  register: imgbackup
+- name: Check backup restoration
+  when: not dbbackup.stat.exists or not imgbackup.stat.exists
+  fail:
+    msg: 'Wiki backup not properly restored. Please follow the README.'
+- name: Run MediaWiki container
+  when: repo.changed or database_container.changed
+  ansible.builtin.command:
+    argv:
+      - /home/pwiki/pwiki/scripts/setup-mediawiki.sh
+      - '--batch'
+      - "{{ mediawiki_release_url }}"
+- name: Set up nginx configuration directory
+  ansible.builtin.file:
+    state: directory
+    dest: "{{ item }}"
+    owner: root
+    group: root
+    mode: '0755'
+  loop:
+    - /etc/nginx
+    - /etc/nginx/conf
+- name: Set up nginx configuration
+  ansible.builtin.template:
+    src: "{{ role_path }}/templates/nginx/{{ item.template }}"
+    dest: "/etc/nginx/{{ item.path }}"
+    owner: root
+    group: root
+    mode: '0644'
+  loop:
+    - {template: 'nginx.conf.j2', path: 'nginx.conf'}
+    - {template: 'pwiki.conf.j2', path: "conf/{{ pwiki_domain }}.conf"}
+  register: nginx_configuration
+- name: Set up SSL certificate directories
+  ansible.builtin.file:
+    state: directory
+    path: "{{ item }}"
+    owner: root
+    group: http
+    mode: '0750'
+  loop:
+    - /etc/ssl
+    - /etc/ssl/private
+- name: Set up LetsEncrypt renewal script
+  ansible.builtin.template:
+    src: "{{ role_path }}/templates/letsencrypt.sh.j2"
+    dest: /etc/ssl/letsencrypt.sh
+    owner: root
+    group: root
+    mode: '0700'
+- name: Set up Lets Encrypt cron job
+  ansible.builtin.cron:
+    name: "letsencrypt_renew_{{ pwiki_domain }}"
+    special_time: daily
+    user: root
+    job: "/etc/ssl/letsencrypt.sh {{ pwiki_domain }}"
+  register: setup_letsencrypt_cron
+- name: Check if LetsEncrypt needs to run for the first time
+  ansible.builtin.command:
+    creates: "/etc/ssl/private/{{ pwiki_domain }}/cert.pem"
+    argv:
+      - /etc/ssl/letsencrypt.sh
+      - "{{ pwiki_domain }}"
+  register: letsencrypt_initial
+- name: Generate Diffie-Hellman TLS group parameters
+  ansible.builtin.command:
+    creates: "/etc/ssl/private/{{ pwiki_domain }}/tls.dh"
+    argv:
+      - openssl
+      - dhparam
+      - '-out'
+      - "/etc/ssl/private/{{ pwiki_domain }}/tls.dh"
+      - '4096'
+  register: diffie_hellman_group
+- name: Ensure Diffie-Hellman TLS group parameters are readable by nginx
+  ansible.builtin.file:
+    path: "/etc/ssl/private/{{ pwiki_domain }}/tls.dh"
+    owner: root
+    group: http
+    mode: '0640'
+- name: Enable nginx
+  ansible.builtin.systemd:
+    name: nginx.service
+    daemon_reload: "{{ packages.changed }}"
+    enabled: yes
+    state: "{{ 'restarted' if packages.changed or nginx_configuration.changed or letsencrypt_initial.changed or diffie_hellman_group.changed else 'started' }}"
+- name: Set up backups
+  when: repo.changed
+  ansible.builtin.command:
+    argv:
+      - /home/pwiki/pwiki/scripts/setup-backups.sh
+      - /etc/pwiki/pwiki-secrets
+  register: setup_backups
+- name: Download bot repository
+  ansible.builtin.git:
+    repo: 'https://github.com/EtiennePerot/mrgusty'
+    recursive: yes
+    dest: /home/pwikibot/bot
+    version: master
+- name: Copy bot configuration file
+  ansible.builtin.copy:
+    src: /etc/pwiki/pwiki-secrets/botConfig.py
+    remote_src: yes
+    dest: /home/pwikibot/bot/botConfig.py
+    owner: pwikibot
+    group: pwiki
+    mode: '0400'
+- name: Set up bot cron job
+  ansible.builtin.cron:
+    name: "pwiki_bot_{{ pwiki_domain }}"
+    special_time: hourly
+    user: pwikibot
+    job: /home/pwikibot/bot/bot.py
+  register: setup_bot_cron
+- name: Start up cronie
+  ansible.builtin.systemd:
+    name: cronie.service
+    daemon_reload: "{{ packages.changed }}"
+    enabled: yes
+    state: "{{ 'restarted' if setup_letsencrypt_cron.changed or setup_backups.changed or setup_bot_cron.changed else 'started' }}"

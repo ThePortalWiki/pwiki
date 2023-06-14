@@ -60,4 +60,4 @@ echo '--------------------------------------------------------' >&2
 echo 'Passphrase (DO NOT WRITE THIS DOWN SOMEWHERE PERMANENT):' >&2
 echo "$PASSPHRASE" >&2
 echo '--------------------------------------------------------' >&2
-# FIXME rm -rf "$tmpDir"
+rm -rf "$tmpDir"

@@ -16,7 +16,7 @@ RUN chmod 555 /install-mediawiki.sh && sudo -u pwiki --preserve-env --set-home /
 RUN rm -rf --one-file-system /extra
 
 # Volume handling.
-RUN mkdir /pwiki-secrets /home/pwiki/www/w/images /home/pwiki/www-private/cache && touch /pwiki-secrets/no-volume /home/pwiki/www/w/images/no-volume && chown pwiki:pwiki /home/pwiki/www/w/images /home/pwiki/www-private/cache
+RUN mkdir /pwiki /pwiki-secrets /home/pwiki/www/w/images /home/pwiki/www-private/cache && touch /pwiki/no-volume /pwiki-secrets/no-volume /home/pwiki/www/w/images/no-volume && chown pwiki:pwiki /home/pwiki/www/w/images /home/pwiki/www-private/cache
 VOLUME /home/pwiki/www-private/cache
 
 COPY pwiki-app.sh /pwiki-app.sh

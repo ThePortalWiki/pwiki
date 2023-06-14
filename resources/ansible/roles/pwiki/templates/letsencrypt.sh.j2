@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -euxo pipefail
+
+systemctl stop nginx || true
+killall nginx || true
+for domain; do
+	certbot certonly \
+		--agree-tos \
+		--email="{{ staff_email }}" \
+		--non-interactive \
+		--standalone \
+		--domain "$domain" || true
+	cp -r --dereference "/etc/letsencrypt/live/$domain" /etc/ssl/private/
+done
+chgrp -R http /etc/ssl/private
+chmod -R g+rX,g-w,o-rwx /etc/ssl/private
+systemctl restart nginx || true

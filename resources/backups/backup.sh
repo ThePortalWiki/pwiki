@@ -9,6 +9,8 @@ BACKUP_GNUPG_SIGNING_KEY='pwikibackup@theportalwiki.com'
 BACKUP_GNUPG_SIGNING_PRIVATE_KEY_FILE="$HOME/signing-key.asc"
 BACKUP_GNUPG_ENCRYPTION_KEY='staff@theportalwiki.com'
 BACKUP_GNUPG_ENCRYPTION_PUBLIC_KEY_FILE="$HOME/encryption-key.pub.asc"
+SECRETS_FILE='/etc/pwiki/pwiki-secrets/secrets.sh'
+REPO_DIR='/home/pwiki/pwiki'
 IMAGES_DIR="$(eval echo "~$WEB_USER/www/w/images")"
 
 howOld() {
@@ -73,7 +75,9 @@ gpg --batch --quiet --import < "$BACKUP_GNUPG_ENCRYPTION_PUBLIC_KEY_FILE" 2>/dev
 echo 'Streaming backup file...' >&2
 tar --create --file=- --xz --one-file-system                                             \
   --warning=no-file-changed --exclude='*/thumb/*' --exclude='*/temp/*'                   \
+  --directory="$(dirname "$SECRETS_FILE")" "$(basename "$SECRETS_FILE")" \
   --directory="$(dirname "$latestDatabaseBackup")" "$(basename "$latestDatabaseBackup")" \
+  --directory="$(dirname "$REPO_DIR")" "$(basename "$REPO_DIR")" \
   --directory="$(dirname "$IMAGES_DIR")"           "$(basename "$IMAGES_DIR")" |         \
 gpg --batch --quiet                                                                      \
   --sign --local-user="$BACKUP_GNUPG_SIGNING_KEY"                                        \

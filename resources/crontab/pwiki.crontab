@@ -1,4 +1,0 @@
-# m  h  dom mon dow   command
-0    5  *   *   *     cronic /home/pwiki/sync.sh
-*/20 *  *   *   *     cronic /home/pwiki/runBot.sh
-0    0  *   *   *     cronic /home/pwiki/pwiki/scripts/generate-sitemap.sh

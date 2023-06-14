@@ -20,6 +20,7 @@ repoDir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 backupResourcesDir="$repoDir/resources/backups"
 
 BACKUP_USER=pwikibackup
+BACKUP_GROUP=pwiki
 WEB_USER=pwiki
 IMAGES_DIR="$(eval echo "~$WEB_USER/www/w/images")"
 SSHD_CONFIG=/etc/ssh/sshd_config
@@ -55,18 +56,18 @@ chmod 400 "$BACKUP_HOME/.ssh/authorized_keys"
 chmod 550 "$BACKUP_HOME/backup.sh"
 ln -fs backup.sh "$BACKUP_HOME/backup"
 chmod 500 "$BACKUP_HOME"
-chown -R "$BACKUP_USER:$BACKUP_USER" "$BACKUP_HOME"
-cat << EOF > /etc/cron.weekly/pwiki-database-backup.sh
+chown -R "$BACKUP_USER:$BACKUP_GROUP" "$BACKUP_HOME"
+cat << EOF > /etc/cron.weekly/pwiki-database-backup
 #!/usr/bin/bash
 
-exec cronic bash -c '"$repoDir/scripts/backup-database.sh" "$secretsDir" "$DATABASE_BACKUP_DIRECTORY/pwiki-\$(date '+%Y-%m-%d').sql.xz"'
+exec '$repoDir/scripts/backup-database.sh' '$secretsDir' "$DATABASE_BACKUP_DIRECTORY/pwiki-\$(date '+%Y-%m-%d').sql.xz"
 EOF
-cat << EOF > /etc/cron.weekly/pwiki-database-backup-cleanup.sh
+cat << EOF > /etc/cron.weekly/pwiki-database-backup-cleanup
 #!/usr/bin/bash
 
-exec cronic find '$DATABASE_BACKUP_DIRECTORY' -type f -mtime +30 -delete
+exec find '$DATABASE_BACKUP_DIRECTORY' -type f -mtime +30 -delete
 EOF
-chmod 500 /etc/cron.weekly/pwiki-database-backup.sh /etc/cron.weekly/pwiki-database-backup-cleanup.sh
+chmod 500 /etc/cron.weekly/pwiki-database-backup /etc/cron.weekly/pwiki-database-backup-cleanup
 
 tmpSSHDConfig="$SSHD_CONFIG.pwiki-tmp"
 cat "$SSHD_CONFIG" | sed -r '/.*#.*MANAGED_BY_PWIKI.*$/d' > "$tmpSSHDConfig"
@@ -84,3 +85,5 @@ EOF
 chmod --reference="$SSHD_CONFIG" "$tmpSSHDConfig"
 chown --reference="$SSHD_CONFIG" "$tmpSSHDConfig"
 mv "$tmpSSHDConfig" "$SSHD_CONFIG"
+systemctl reload sshd
+touch "$BACKUP_HOME/.backups-set-up-successfully"

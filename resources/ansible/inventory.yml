@@ -1,0 +1,4 @@
+all:
+  hosts:
+    pwiki_dev:
+      ansible_host: dev.theportalwiki.com
