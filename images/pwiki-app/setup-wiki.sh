@@ -2,9 +2,9 @@
 
 set -e
 set -x
-apt-get install -y sudo gnupg2 wget curl libcurl4-openssl-dev libmcrypt-dev libpng-dev libxml2-dev imagemagick psutils msmtp
+apt-get install -y sudo gnupg2 wget curl libcurl4-openssl-dev libmcrypt-dev libpng-dev libzip-dev libxml2-dev libonig-dev imagemagick psutils msmtp
 
-docker-php-ext-install -j"$(nproc)" curl dom fileinfo gd iconv json mbstring mcrypt mysql session xml zip
+docker-php-ext-install -j"$(nproc)" curl dom fileinfo gd iconv json mbstring mysqli session xml zip
 pear install mail
 pear install net_smtp
 

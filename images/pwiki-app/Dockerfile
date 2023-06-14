@@ -1,5 +1,6 @@
-FROM php:5-fpm
+FROM php:7-fpm
 
+# You can change this value to invalidate the Docker build cache and force a rebuild.
 ARG REBUILD=1
 
 RUN apt-get update && apt-get upgrade -y
