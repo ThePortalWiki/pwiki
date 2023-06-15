@@ -15,7 +15,7 @@
 	url = https://github.com/ThePortalWiki/GeeQuBox
 [submodule "extra/extensions/MobileFrontend"]
 	path = images/pwiki-app/extra/extensions/MobileFrontend
-	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/MobileFrontend
+	url = https://gerrit.wikimedia.org/r/mediawiki/extensions/MobileFrontend/
 [submodule "extra/extensions/RedditThumbnail"]
 	path = images/pwiki-app/extra/extensions/RedditThumbnail
 	url = https://github.com/ThePortalWiki/RedditThumbnail
@@ -27,7 +27,7 @@
 	url = https://github.com/ThePortalWiki/LangUtils
 [submodule "extra/extensions/EmbedVideo"]
 	path = images/pwiki-app/extra/extensions/EmbedVideo
-	url = https://github.com/HydraWiki/mediawiki-embedvideo
+	url = https://gitlab.com/hydrawiki/extensions/EmbedVideo.git
 [submodule "resources/backups/secret-sharing"]
 	path = resources/backups/secret-sharing
 	url = https://github.com/ThePortalWiki/secret-sharing
