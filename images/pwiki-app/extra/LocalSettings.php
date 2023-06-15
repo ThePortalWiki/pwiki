@@ -9,10 +9,11 @@ if(isset($_SERVER['HTTP_HOST']) && substr_compare($_SERVER['HTTP_HOST'], '.net',
 
 set_time_limit(120);
 # ----- DEBUG SETTINGS
-#set_time_limit(0);
+set_time_limit(0);
+error_reporting(E_ERROR | E_PARSE);  # Hide warnings
 #error_reporting(E_ALL);
 #ini_set('display_errors', 1);
-#$wgShowExceptionDetails = true;
+$wgShowExceptionDetails = true;
 # ----- END DEBUG SETTINGS
 
 # Read only mode
@@ -169,7 +170,7 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
   # Load Vector skin. MediaWiki 1.24+ requires manual listing of skins.
   if(function_exists('wfLoadSkin')) {
     # MediaWiki 1.25+
-    wfLoadSkin( 'Vector' );
+    wfLoadSkin('Vector');
   } else if (file_exists("$IP/skins/Vector/Vector.php")) {
     # MediaWiki 1.24
     require_once("$IP/skins/Vector/Vector.php");
@@ -315,8 +316,9 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
   if (function_exists('wfLoadExtension')) { wfLoadExtension('CodeEditor'); } else { require_once( "$IP/extensions/CodeEditor/CodeEditor.php" ); }
   if (function_exists('wfLoadExtension')) { wfLoadExtension('Cite'); } else { require_once( "$IP/extensions/Cite/Cite.php" ); }
 
-  if (function_exists('wfLoadExtension')) { wfLoadExtension('RedditThumbnail'); } else { require_once( "$IP/extensions/RedditThumbnail/RedditThumbnail.php" ); }
-  $wgRedditThumbnailImage = 'https://i1.theportalwiki.net/img/c/c0/Wiki_logo_highres.png';
+  # RedditThumbnail was not updated to extension.json. TODO
+  #if (function_exists('wfLoadExtension')) { wfLoadExtension('RedditThumbnail'); } else { require_once( "$IP/extensions/RedditThumbnail/RedditThumbnail.php" ); }
+  #$wgRedditThumbnailImage = 'https://i1.theportalwiki.net/img/c/c0/Wiki_logo_highres.png';
   
   if (function_exists('wfLoadExtension')) { wfLoadExtension('ConfirmEdit'); } else { require_once( "$IP/extensions/ConfirmEdit/ConfirmEdit.php" ); }
   require_once("$IP/extensions/ConfirmEdit/QuestyCaptcha.php");
@@ -332,6 +334,7 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
 
   if (function_exists('wfLoadExtension')) { wfLoadExtension('EmbedVideo'); } else { require_once( "$IP/extensions/EmbedVideo/EmbedVideo.php" ); }
 
+  /* LangUtils has not been updated for the switch to extension.json. Need to fix.
   if (function_exists('wfLoadExtension')) { wfLoadExtension('LangUtils'); } else { require_once( "$IP/extensions/LangUtils/LangUtils.php" ); }
   $wgAllowedLanguages = array( 
       'ar', 
@@ -356,18 +359,18 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
       # 'tr', No Turkish on Portal Wiki
       'zh-hans', 
       'zh-hant'
-  );
+  );*/
 
-  if (function_exists('wfLoadExtension')) { wfLoadExtension('Substring_and_strlen'); } else { require_once( "$IP/extensions/Substring_and_strlen/Substring_and_strlen.php" ); }
+  # Substring_and_strlen was not updated for extension.json. TODO
+  # if (function_exists('wfLoadExtension')) { wfLoadExtension('Substring_and_strlen'); } else { require_once( "$IP/extensions/Substring_and_strlen/Substring_and_strlen.php" ); }
 
-  if (function_exists('wfLoadExtension')) { wfLoadExtension('MediawikiPlayer'); } else { require_once( "$IP/extensions/MediawikiPlayer/MediawikiPlayer.php" ); }
-
-  if (function_exists('wfLoadExtension')) { wfLoadExtension('GeeQuBox'); } else { require_once( "$IP/extensions/GeeQuBox/GeeQuBox.php" ); }
+  # GeeQuBox is a dead extension.
+  # if (function_exists('wfLoadExtension')) { wfLoadExtension('GeeQuBox'); } else { require_once( "$IP/extensions/GeeQuBox/GeeQuBox.php" ); }
 
   if (function_exists('wfLoadExtension')) { wfLoadExtension('TitleBlacklist'); } else { require_once( "$IP/extensions/TitleBlacklist/TitleBlacklist.php" ); }
   $wgTitleBlacklistSources = array(
           array(
-                  'type' => TBLSRC_LOCALPAGE,
+                  'type' => 'localpage',
                   'src' => 'MediaWiki:Titleblacklist'
           )
   );

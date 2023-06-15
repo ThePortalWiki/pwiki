@@ -117,18 +117,37 @@ mv "$STAGING_DIR" "$MEDIAWIKI_TESTROOT"
 rm -rf --one-file-system "$BUILD_DIR"
 cp -r "$EXTRA_ROOT"/* "$MEDIAWIKI_TESTROOT/"
 # Replace all PHP files copied from EXTRA_ROOT, as they should be executed from within the container.
+set +x
 for phpFile in "$MEDIAWIKI_TESTROOT"/**/*.php; do
+	if [[ -d "$phpFile" ]]; then
+		# Skip directories that end in `.php`.
+		continue
+	fi
+	if [[ ! -f "$phpFile" ]]; then
+		# A non-regular-file, non-directory file ending in `.php` is very weird.
+		echo "Unexpected non-regular-file non-directory file ending in .php: $phpFile" >&2
+		exit 1
+	fi
 	cat << EOF > "$phpFile"
 <?php
 die('This file should never be executed from outside the PHP-FPM container. Something is wrong with the wiki setup. If you see this and have no idea what this error message is about, please contact a Wiki staff member.');
 EOF
 done
+set -x
 chown -R --reference="$WEBROOT" "$MEDIAWIKI_TESTROOT"
 chmod -R u+rwX,g+rwX,o-rwx "$MEDIAWIKI_TESTROOT"
 
 run_app() {
 	echo "Running container app with tag '$1'." >&2
-	docker run --detach --name="$CONTAINER_APP_NAME" --link="$CONTAINER_DATABASE_NAME:$CONTAINER_DATABASE_NAME" --volume="$ETC_DIR:/pwiki" --volume="$SECRETS_DIR:/pwiki-secrets" --volume="$MEDIAWIKI_IMAGES_MOUNTPOINT:$MEDIAWIKI_IMAGES_MOUNTPOINT" --publish="$PHP_FPM_BIND_HOSTPORT:9000" "$1"
+	docker run \
+		--detach \
+		--name="$CONTAINER_APP_NAME" \
+		--link="$CONTAINER_DATABASE_NAME:$CONTAINER_DATABASE_NAME" \
+		--volume="$ETC_DIR:/pwiki" \
+		--volume="$SECRETS_DIR:/pwiki-secrets" \
+		--volume="$MEDIAWIKI_IMAGES_MOUNTPOINT:$MEDIAWIKI_IMAGES_MOUNTPOINT" \
+		--publish="$PHP_FPM_BIND_HOSTPORT:9000" \
+		"$1"
 }
 
 # Determine currently-running release.

@@ -4,7 +4,7 @@ Incomplete because it wasn't open source from the beginning. Sorry.
 
 ## Current versions
 
-* MediaWiki: **1.23.15**
+* MediaWiki: **1.27.7**
 * PHP: **7.x**
 * MariaDB: **11.0**
 
@@ -135,7 +135,7 @@ It also bundles some more functionality to make MediaWiki work properly:
 * `msmtp` to send email through Gmail via SMTP
 * TODO: Add some opcode caching thing as well
 
-Container build arguments (these are typically automatically passed in by `scripts/upgrade-mediawiki.sh`):
+Container build arguments:
 
 * `WIKI_UIDGID`: A numeric `uid:gid` pair which will be used for the user running `php-fpm`.
 * `MEDIAWIKI_RELEASE`: The full URL of a MediaWiki release tarball.
@@ -144,20 +144,3 @@ It requires two volume mounts:
 
 * `/pwiki-secrets`: Used to get database and SMTP credentials.
 * `/home/pwiki/www/w/images/`: Used to drop uploaded files upon upload. This needs to be writable by the user running inside the container, which has its UID/GID defined by the container's build arguments.
-
-## Upgrading MediaWiki
-
-```bash
-$ ./scripts/upgrade-mediawiki.sh https://releases.wikimedia.org/mediawiki/x.xx/mediawiki-x.xx.xx.tar.gz
-```
-
-This will do the following:
-
-* Download the release
-* Verify its GPG signature
-* Extract it
-* Add in theportalwiki.com-related customizations
-* Do the same, but outside the Docker container (for static file serving)
-* Re-run the main Docker container
-* Ask you whether everything is working at https://theportalwiki.com
-* Depending on your answer, either delete the old version or revert to it
