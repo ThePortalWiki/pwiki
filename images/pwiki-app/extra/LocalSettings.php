@@ -10,9 +10,9 @@ if(isset($_SERVER['HTTP_HOST']) && substr_compare($_SERVER['HTTP_HOST'], '.net',
 set_time_limit(120);
 # ----- DEBUG SETTINGS
 set_time_limit(0);
-error_reporting(E_ERROR | E_PARSE);  # Hide warnings
-#error_reporting(E_ALL);
-#ini_set('display_errors', 1);
+#error_reporting(E_ERROR | E_PARSE);  # Hide warnings
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 $wgShowExceptionDetails = true;
 # ----- END DEBUG SETTINGS
 
@@ -320,8 +320,14 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
   #if (function_exists('wfLoadExtension')) { wfLoadExtension('RedditThumbnail'); } else { require_once( "$IP/extensions/RedditThumbnail/RedditThumbnail.php" ); }
   #$wgRedditThumbnailImage = 'https://i1.theportalwiki.net/img/c/c0/Wiki_logo_highres.png';
   
-  if (function_exists('wfLoadExtension')) { wfLoadExtension('ConfirmEdit'); } else { require_once( "$IP/extensions/ConfirmEdit/ConfirmEdit.php" ); }
-  require_once("$IP/extensions/ConfirmEdit/QuestyCaptcha.php");
+  if (function_exists('wfLoadExtension')) {
+    wfLoadExtension('ConfirmEdit');
+    # Pre MW 1.35, QuestyCaptcha has to be loaded using require_once:
+    require_once("$IP/extensions/ConfirmEdit/QuestyCaptcha.php");
+  } else {
+    require_once("$IP/extensions/ConfirmEdit/ConfirmEdit.php");
+    require_once("$IP/extensions/ConfirmEdit/QuestyCaptcha.php");
+  }
   $wgCaptchaClass = 'QuestyCaptcha';
   # $wgReCaptchaPublicKey and $wgReCaptchaPrivateKey are defined in mediawiki-secrets.php
   $randomHash = substr(sha1(strval(rand())), rand(1, 4), rand(12, 16));
