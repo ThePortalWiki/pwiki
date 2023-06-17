@@ -16,6 +16,9 @@ COPY install-mediawiki.sh extra-keys.asc /
 RUN chmod 555 /install-mediawiki.sh && sudo -u pwiki --preserve-env --set-home /install-mediawiki.sh && rm /install-mediawiki.sh /extra-keys.asc
 RUN rm -rf --one-file-system /extra
 
+COPY patches /patches
+RUN chown -R pwiki:pwiki /patches
+
 # Volume handling.
 RUN mkdir /pwiki /pwiki-secrets /home/pwiki/www/w/images /home/pwiki/www-private/cache && touch /pwiki/no-volume /pwiki-secrets/no-volume /home/pwiki/www/w/images/no-volume && chown pwiki:pwiki /home/pwiki/www/w/images /home/pwiki/www-private/cache
 VOLUME /home/pwiki/www-private/cache

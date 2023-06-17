@@ -4,7 +4,7 @@ Incomplete because it wasn't open source from the beginning. Sorry.
 
 ## Current versions
 
-* MediaWiki: **1.27.7**
+* MediaWiki: **1.39.3**
 * PHP: **7.x**
 * MariaDB: **11.0**
 

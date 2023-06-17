@@ -14,7 +14,15 @@ cp /pwiki-secrets/mediawiki-secrets.php ~pwiki/www-private/mediawiki-secrets.php
 cp /pwiki-secrets/smtp-password ~pwiki/www-private/smtp-password
 chown -R pwiki:pwiki ~pwiki/www-private
 
-pushd ~pwiki/www/w/maintenance
+pushd ~pwiki/www &>/dev/null
+	if [[ "$(ls -1 /patches | grep -P '\.patch$' | wc -l)" -gt 0 ]]; then
+		for patch in /patches/*.patch; do
+			patch -p1 < "$patch"
+		done
+	fi
+popd &>/dev/null
+
+pushd ~pwiki/www/w/maintenance &>/dev/null
 	# Sanity check that the database is up and running.
 	if ! sudo -u pwiki php showSiteStats.php; then
 		echo "Cannot show site statistics." >&2
@@ -41,7 +49,7 @@ pushd ~pwiki/www/w/maintenance
 			exit 1
 		fi
 	fi
-popd
+popd &>/dev/null
 
 # Unfortunately PHP just leaks memory over time, so we need to restart
 # the workers every once in a while.

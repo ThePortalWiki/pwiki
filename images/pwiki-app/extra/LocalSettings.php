@@ -33,18 +33,8 @@ $wgShowExceptionDetails = true;
 # Further documentation for configuration settings may be found at:
 # https://www.mediawiki.org/wiki/Manual:Configuration_settings
 
-# If you customize your file layout, set $IP to the directory that contains
-# the other MediaWiki files. It will be used as a base to locate files.
-if( defined( 'MW_INSTALL_PATH' ) ) {
-	$IP = MW_INSTALL_PATH;
-} else {
-	$IP = dirname( __FILE__ );
-}
-
 $path = array( $IP, "$IP/includes", "$IP/languages" );
 set_include_path( implode( PATH_SEPARATOR, $path ) . PATH_SEPARATOR . get_include_path() );
-
-require_once( "$IP/includes/DefaultSettings.php" );
 
 if ( $wgCommandLineMode ) {
 	if ( isset( $_SERVER ) && array_key_exists( 'REQUEST_METHOD', $_SERVER ) ) {
