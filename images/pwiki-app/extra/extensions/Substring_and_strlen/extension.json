@@ -1,0 +1,29 @@
+{
+    "name": "SubStringAndStrLen",
+    "author": [
+        "WindPower"
+    ],
+    "url": "https://github.com/ThePortalWiki/",
+    "descriptionmsg": "substringandstrlen-desc",
+    "version": "1.0.0",
+    "license-name": "Apache-2.0",
+    "type": "other",
+    "requires": {
+        "MediaWiki": ">= 1.27.0"
+    },
+    "Hooks": {
+        "ParserFirstCallInit": "SubStringAndStrLenHooks::onParserFirstCallInit"
+    },
+    "AutoloadClasses": {
+        "SubStringAndStrLenHooks": "Substring_and_strlen.php"
+    },
+    "MessagesDirs": {
+        "SubStringAndStrLen": [
+            "i18n"
+        ]
+    },
+    "ExtensionMessagesFiles": {
+        "SubStringAndStrLenMagic": "Substring_and_strlen.i18n.php"
+    },
+    "manifest_version": 2
+}

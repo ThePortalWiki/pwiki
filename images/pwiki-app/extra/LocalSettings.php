@@ -331,8 +331,7 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
   
   if (function_exists('wfLoadExtension')) {
     wfLoadExtension('ConfirmEdit');
-    # Pre MW 1.35, QuestyCaptcha has to be loaded using require_once:
-    require_once("$IP/extensions/ConfirmEdit/QuestyCaptcha.php");
+    wfLoadExtension('ConfirmEdit/QuestyCaptcha');
   } else {
     require_once("$IP/extensions/ConfirmEdit/ConfirmEdit.php");
     require_once("$IP/extensions/ConfirmEdit/QuestyCaptcha.php");
@@ -376,8 +375,7 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
       'zh-hant'
   );*/
 
-  # Substring_and_strlen was not updated for extension.json. TODO
-  # if (function_exists('wfLoadExtension')) { wfLoadExtension('Substring_and_strlen'); } else { require_once( "$IP/extensions/Substring_and_strlen/Substring_and_strlen.php" ); }
+  if (function_exists('wfLoadExtension')) { wfLoadExtension('Substring_and_strlen'); } else { require_once( "$IP/extensions/Substring_and_strlen/Substring_and_strlen.php" ); }
 
   # GeeQuBox is a dead extension.
   # if (function_exists('wfLoadExtension')) { wfLoadExtension('GeeQuBox'); } else { require_once( "$IP/extensions/GeeQuBox/GeeQuBox.php" ); }
