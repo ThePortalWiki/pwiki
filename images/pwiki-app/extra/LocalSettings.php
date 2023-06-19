@@ -338,33 +338,7 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
 
   if (function_exists('wfLoadExtension')) { wfLoadExtension('EmbedVideo'); } else { require_once( "$IP/extensions/EmbedVideo/EmbedVideo.php" ); }
 
-  /* LangUtils has not been updated for the switch to extension.json. Need to fix.
   if (function_exists('wfLoadExtension')) { wfLoadExtension('LangUtils'); } else { require_once( "$IP/extensions/LangUtils/LangUtils.php" ); }
-  $wgAllowedLanguages = array( 
-      'ar', 
-      'cs', 
-      'da', 
-      'de', 
-      'es', 
-      'fi', 
-      'fr', 
-      'hu', 
-      'it', 
-      'ja', 
-      'ko', 
-      'nl', 
-      'no', 
-      'pl', 
-      'pt', 
-      'pt-br', 
-      'ro', 
-      'ru', 
-      'sv', 
-      # 'tr', No Turkish on Portal Wiki
-      'zh-hans', 
-      'zh-hant'
-  );*/
-
   if (function_exists('wfLoadExtension')) { wfLoadExtension('Substring_and_strlen'); } else { require_once( "$IP/extensions/Substring_and_strlen/Substring_and_strlen.php" ); }
 
   # GeeQuBox is a dead extension.
