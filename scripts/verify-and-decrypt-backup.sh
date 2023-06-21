@@ -4,12 +4,27 @@ set -euo pipefail
 
 SIGNING_KEY_FINGERPRINT='1FA1E516E443B624F9B49599C3C4164B2909D259'
 
-if [[ "$#" != 1 ]]; then
-	echo "Usage: echo -n backup_decryption_key_passphrase | $0 path/to/backup-YYYY-MM-DD.tar.xz.gpg.gpg > pwiki-backup.tar.xz" >&2
+if [[ "$#" == 0 ]]; then
+	echo "Usage: echo -n backup_decryption_key_passphrase | $0 [--tmpdir=/tmp] path/to/backup-YYYY-MM-DD.tar.xz.gpg.gpg > pwiki-backup.tar.xz" >&2
 	exit 1
 fi
 
 decryptionKeyPassphrase="$(</dev/stdin)"
+
+tmpDirBase=''
+keepLooking=true
+while [[ "$keepLooking" == true ]]; do
+	keepLooking=false
+	if echo "$1" | grep -qP '^--tmpdir='; then
+		tmpDirBase="$(echo "$1" | cut -d'=' -f2-)"
+		shift
+		keepLooking=true
+		continue
+	fi
+done
+if [[ -z "$tmpDirBase" ]]; then
+	tmpDirBase=/tmp
+fi
 
 backupFile="$1"
 if [[ ! -f "$backupFile" ]]; then
@@ -27,14 +42,18 @@ signingKey="$repoDir/resources/backups/signing-key.asc"
 encryptionKey="$repoDir/resources/backups/encryption-key.asc"
 
 echo "Importing keys into temporary GnuPG directory..." >&2
-tmpDir="$(mktemp -d)"
+tmpDir="$(mktemp -d -p "$tmpDirBase" 'tmp-wiki-backup.XXXXXX')"
 run_gpg() {
 	GNUPGHOME="$tmpDir/.gnupg" gpg --batch --yes "$@"
 }
 export GNUPGHOME="$tmpDir/.gnupg"
 mkdir -m700 "$GNUPGHOME"
 echo -n "$decryptionKeyPassphrase" | run_gpg --passphrase-fd 0 --pinentry-mode loopback --import "$encryptionKey" 2>/dev/null || (echo 'GnuPG error while importing encryption key; perhaps the passphrase is wrong?' >&2; exit 1)
-run_gpg --import < "$signingKey" 2>/dev/null || (echo 'GnuPG error while importing signing key.' >&2; exit 1)
+if ! run_gpg --import < "$signingKey" 2>/dev/null; then
+	echo 'GnuPG error while importing signing key.' >&2
+	rm -r "$tmpDir"
+	exit 1
+fi
 
 echo "Verifying integrity and decrypting backup file..." >&2
 run_gpg \

@@ -4,6 +4,7 @@ set -euo pipefail
 
 if [[ "$#" != 1 ]]; then
 	echo "Usage:  $0 path/to/backup-YYYY-MM-DD.tar.xz" >&2
+	echo "Note that this will *delete* the backup archive upon successful backup restoration." >&2
 	exit 1
 fi
 
@@ -31,8 +32,8 @@ echo "GRANT ALL PRIVILEGES ON $MYSQL_DATABASE.* TO '$MYSQL_USER'@'%';" | do_mysq
 echo "GRANT SELECT ON $MYSQL_DATABASE.* TO '$READONLY_USER'@'%';" | do_mysql
 echo 'FLUSH PRIVILEGES;' | do_mysql
 
-echo 'Restoring images...' >&2
+echo 'Restoring uploaded files...' >&2
 tar -xf "$backupFile" -C /home/pwiki/www-private/ 'images'
 
 rm "$backupFile"
-echo 'Backup restored and removed from filesystem.' >&2
+echo "Backup restored, and backup archive ($backupFile) removed from filesystem." >&2
