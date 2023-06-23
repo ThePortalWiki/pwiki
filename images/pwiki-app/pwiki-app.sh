@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -euxo pipefail
 
 if [ -e /pwiki/no-volume -o -e /pwiki-secrets/no-volume -o -e /home/pwiki/www/w/images/no-volume ]; then
 	echo 'Volumes not mounted.' >&2
@@ -24,6 +24,22 @@ pushd ~pwiki/www/w/maintenance
 	if ! sudo -u pwiki php update.php --quick; then
 		echo "Maintenance script failed." >&2
 		exit 1
+	fi
+	if [[ -f cleanupUsersWithNoId.php ]]; then
+		# Run user cleanup script.
+		if ! sudo -u pwiki php cleanupUsersWithNoId.php --prefix '*'; then
+			echo "cleanupUsersWithNoId.php script failed." >&2
+			exit 1
+		fi
+	fi
+	if [[ -f migrateActors.php ]]; then
+		# Run actor migration script.
+		# This may need re-running:
+		# https://www.mediawiki.org/w/index.php?title=Topic:V6ka95f08v2c89yp&topic_showPostId=v6vwyo8mnmjx7v0i#flow-post-v6vwyo8mnmjx7v0i
+		if ! sudo -u pwiki php migrateActors.php; then
+			echo "migrateActors.php script failed." >&2
+			exit 1
+		fi
 	fi
 popd
 
