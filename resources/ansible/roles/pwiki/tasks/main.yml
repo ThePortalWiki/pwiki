@@ -92,6 +92,13 @@
     owner: root
     group: root
     mode: '0644'
+- name: Create wiki name file
+  ansible.builtin.copy:
+    content: "{{ pwiki_name }}"
+    dest: /etc/pwiki/pwiki.name
+    owner: root
+    group: root
+    mode: '0644'
 - name: Clone repository contents
   ansible.posix.synchronize:
     src: "{{ role_path }}/../../../../"

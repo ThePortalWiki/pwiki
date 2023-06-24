@@ -1,4 +1,5 @@
 mediawiki_release_url: 'https://releases.wikimedia.org/mediawiki/1.31/mediawiki-1.31.16.tar.gz'
+pwiki_name: 'Portal Wiki'
 pwiki_gid: 18374
 pwiki_uid: 18374
 pwikibackup_uid: 18375

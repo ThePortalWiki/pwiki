@@ -1,9 +1,12 @@
 <?php
 
+$_globalWikiName = 'WILL_BE_REPLACED_BY_WIKI_NAME';
+$_globalWikiDomain = 'WILL_BE_REPLACED_BY_WIKI_DOMAIN';
+
 # Redirect to .com if on .net
 if(isset($_SERVER['HTTP_HOST']) && substr_compare($_SERVER['HTTP_HOST'], '.net', -4, 4) === 0) {
 	header('HTTP/1.0 301 Moved Permanently');
-	header('Location: https://theportalwiki.com'.$_SERVER['REQUEST_URI']);
+	header('Location: https://'.$_globalWikiDomain.$_SERVER['REQUEST_URI']);
 	die();
 }
 
@@ -51,8 +54,8 @@ if ( $wgCommandLineMode ) {
 ## Uncomment this to disable output compression
 # $wgDisableOutputCompression = true;
 
-$wgSitename         = "Portal Wiki";
-$wgServer           = 'https://theportalwiki.com';
+$wgSitename         = $_globalWikiName;
+$wgServer           = 'https://'.$_globalWikiDomain;
 
 ## The URL base path to the directory containing the wiki;
 ## defaults for all runtime URL paths are based off of this.
@@ -160,7 +163,7 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
   $wgSMTP = [
       'host' => 'ssl://smtp.gmail.com',
       'IDHost' => 'gmail.com',
-      'localhost' => 'theportalwiki.com',
+      'localhost' => $_globalWikiDomain,
       'port' => 465,
       'username' => 'portal2wiki@gmail.com',
       'password' => $smtpEmailPassword,
@@ -200,10 +203,16 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
 
   $wgUploadDirectory = "{$IP}/images";
 
-  $wgUploadPath = 'https://i1.theportalwiki.net/img';
-  $wgLoadScript = 'https://i2.theportalwiki.net/js.png';
-  $wgStylePath = 'https://i2.theportalwiki.net/w/skins';
-  $wgLogo = 'https://i2.theportalwiki.net/img/3/3b/Wiki_logo.png';
+  $cdnDomain1 = $_globalWikiDomain;
+  $cdnDomain2 = $_globalWikiDomain;
+  if ($_globalWikiDomain == 'theportalwiki.com') {
+    $cdnDomain1 = 'i1.theportalwiki.net';
+    $cdnDomain2 = 'i2.theportalwiki.net';
+  }
+  $wgUploadPath = 'https://'.$cdnDomain1.'/img';
+  $wgLoadScript = 'https://'.$cdnDomain2.'/js.png';
+  $wgStylePath = 'https://'.$cdnDomain2.'/w/skins';
+  $wgLogo = 'https://'.$cdnDomain2.'/img/3/3b/Wiki_logo.png';
 
   # Namespace aliases
   $wgNamespaceAliases['P'] = NS_PROJECT;

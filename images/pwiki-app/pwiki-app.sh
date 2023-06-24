@@ -7,6 +7,9 @@ if [ -e /pwiki/no-volume -o -e /pwiki-secrets/no-volume -o -e /home/pwiki/www/w/
 	exit 1
 fi
 PWIKI_DOMAIN="$(cat /pwiki/pwiki.domain)"
+PWIKI_NAME="$(cat /pwiki/pwiki.name)"
+sed -i "s~WILL_BE_REPLACED_BY_WIKI_DOMAIN~${PWIKI_DOMAIN}~g" /home/pwiki/www/w/LocalSettings.php
+sed -i "s~WILL_BE_REPLACED_BY_WIKI_NAME~${PWIKI_NAME}~g"     /home/pwiki/www/w/LocalSettings.php
 cp /pwiki-secrets/mediawiki-secrets.php ~pwiki/www-private/mediawiki-secrets.php
 cp /pwiki-secrets/smtp-password ~pwiki/www-private/smtp-password
 chown -R pwiki:pwiki ~pwiki/www-private
