@@ -127,7 +127,7 @@ $ ./scripts/backup-database.sh /etc/pwiki/pwiki-secrets "/home/pwikibackup/datab
 
 ### MediaWiki application container
 
-The main containerm `pwiki-app`, is based off [Docker's official `php` container](https://hub.docker.com/_/php/) running in `php-fpm` mode. The MediaWiki installation is stripped down to only its PHP files to minimize image size, and nginx only forwards requests for `*.php` to it. It is automatically built and deployed by the `scripts/upgrade-mediawiki.sh` script documented below.
+The main containerm `pwiki-app`, is based off [Docker's official `php` container](https://hub.docker.com/_/php/) running in `php-fpm` mode. The MediaWiki installation is stripped down to only its PHP files to minimize image size, and nginx only forwards requests for `*.php` to it. It runs sandboxed with [gVisor](https://gvisor.dev) for extra security. It is automatically built and deployed by the `scripts/upgrade-mediawiki.sh` script documented below.
 
 It also bundles some more functionality to make MediaWiki work properly:
 

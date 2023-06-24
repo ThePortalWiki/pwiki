@@ -142,6 +142,10 @@
     - mediawiki-secrets.php
     - smtp-password
     - botConfig.py
+- name: Install gVisor
+  ansible.builtin.command:
+    argv:
+      - /home/pwiki/pwiki/scripts/setup-gvisor.sh
 - name: Build pwiki-mariadb Docker image
   community.docker.docker_image:
     name: pwiki-mariadb

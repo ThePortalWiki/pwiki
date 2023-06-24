@@ -142,6 +142,7 @@ run_app() {
 	docker run \
 		--detach \
 		--name="$CONTAINER_APP_NAME" \
+		--runtime=runsc \
 		--link="$CONTAINER_DATABASE_NAME:$CONTAINER_DATABASE_NAME" \
 		--volume="$ETC_DIR:/pwiki" \
 		--volume="$SECRETS_DIR:/pwiki-secrets" \
