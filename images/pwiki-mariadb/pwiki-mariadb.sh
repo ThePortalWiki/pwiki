@@ -20,4 +20,4 @@ CREATE USER '$READONLY_USER'@'%' IDENTIFIED BY '$READONLY_PASSWORD';
 GRANT SELECT ON \`$MYSQL_DATABASE\`.* TO '$READONLY_USER'@'%';
 FLUSH PRIVILEGES;
 EOF
-exec /usr/local/bin/docker-entrypoint.sh mysqld "$@"
+exec /usr/local/bin/docker-entrypoint.sh mariadbd "$@"

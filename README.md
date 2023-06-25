@@ -6,7 +6,7 @@ Incomplete because it wasn't open source from the beginning. Sorry.
 
 * MediaWiki: **1.23.15**
 * PHP: **7.x**
-* MariaDB: **10.x**
+* MariaDB: **11.0**
 
 ## Setup
 

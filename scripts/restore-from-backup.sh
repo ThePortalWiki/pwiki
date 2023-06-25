@@ -11,7 +11,7 @@ backupFile="$1"
 source /etc/pwiki/pwiki-secrets/secrets.sh
 
 do_mysql() {
-	docker exec -i pwiki-mariadb mysql -uroot -p"$MYSQL_ROOT_PASSWORD"
+	docker exec -i pwiki-mariadb mariadb -uroot -p"$MYSQL_ROOT_PASSWORD"
 }
 
 echo 'Restoring database backup...' >&2
