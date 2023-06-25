@@ -356,8 +356,9 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
   if (function_exists('wfLoadExtension')) { wfLoadExtension('LangUtils'); } else { require_once( "$IP/extensions/LangUtils/LangUtils.php" ); }
   if (function_exists('wfLoadExtension')) { wfLoadExtension('Substring_and_strlen'); } else { require_once( "$IP/extensions/Substring_and_strlen/Substring_and_strlen.php" ); }
 
-  # GeeQuBox is a dead extension.
+  # GeeQuBox is a dead extension. MultimediaViewer replaces it.
   # if (function_exists('wfLoadExtension')) { wfLoadExtension('GeeQuBox'); } else { require_once( "$IP/extensions/GeeQuBox/GeeQuBox.php" ); }
+  if (function_exists('wfLoadExtension')) { wfLoadExtension('MultimediaViewer'); }
 
   if (function_exists('wfLoadExtension')) { wfLoadExtension('TitleBlacklist'); } else { require_once( "$IP/extensions/TitleBlacklist/TitleBlacklist.php" ); }
   $wgTitleBlacklistSources = array(
