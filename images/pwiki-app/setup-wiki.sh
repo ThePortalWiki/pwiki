@@ -13,7 +13,9 @@ done
 pear install mail
 pear install net_smtp
 
-# TODO: Also add APC/xcache.
+# Get the latest APCu version number from https://pecl.php.net/package/APCU
+pecl install -f apcu-5.1.22 </dev/null
+docker-php-ext-enable apcu --ini-name 10-docker-php-ext-apcu.ini
 
 WIKI_UID="$(echo "$WIKI_UIDGID" | cut -d: -f1)"
 WIKI_GID="$(echo "$WIKI_UIDGID" | cut -d: -f2)"

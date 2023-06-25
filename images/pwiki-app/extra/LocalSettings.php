@@ -185,6 +185,9 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
   # Maximum amount of virtual memory available to shell processes under linux, in KB.
   $wgMaxShellMemory = 131072;
 
+  # Enable object caching with APCu:
+  $wgMainCacheType = CACHE_ACCEL;
+
   # Enable subpages in certain namespaces (necessary for translation switching)
   $wgNamespacesWithSubpages[NS_MAIN]     = true;
   $wgNamespacesWithSubpages[NS_CATEGORY] = true;
