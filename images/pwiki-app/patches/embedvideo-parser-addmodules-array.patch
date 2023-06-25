@@ -1,12 +1,14 @@
-diff --git EmbedVideo.hooks.php EmbedVideo.hooks.php
-index 0fb64d3..27767b3 100644
+diff --git a/w/extensions/EmbedVideo/EmbedVideo.hooks.php b/w/extensions/EmbedVideo/EmbedVideo.hooks.php
+index 0fb64d3..ae5fefd 100644
 --- a/w/extensions/EmbedVideo/EmbedVideo.hooks.php
 +++ b/w/extensions/EmbedVideo/EmbedVideo.hooks.php
-@@ -596,7 +596,7 @@ class EmbedVideoHooks {
+@@ -595,8 +595,8 @@ class EmbedVideoHooks {
+ 		if ($parser) {
  			// dont call this if parser is null (such as in API usage).
  			$out = $parser->getOutput();
- 			$out->addModules( 'ext.embedVideo' );
+-			$out->addModules( 'ext.embedVideo' );
 -			$out->addModuleStyles( 'ext.embedVideo.styles' );
++			$out->addModules( [ 'ext.embedVideo' ] );
 +			$out->addModuleStyles( [ 'ext.embedVideo.styles' ] );
  		}
  
