@@ -1,10 +1,15 @@
 #!/usr/bin/env bash
 
-set -e
-set -x
+set -euxo pipefail
+
 apt-get install -y sudo gnupg2 wget curl libcurl4-openssl-dev libmcrypt-dev libpng-dev libzip-dev libxml2-dev libonig-dev imagemagick psutils procps msmtp
 
-docker-php-ext-install -j"$(nproc)" curl dom fileinfo gd iconv intl json mbstring mysqli session xml zip
+for ext in curl dom fileinfo gd iconv intl mbstring mysqli session xml zip; do
+	if ! docker-php-ext-install -j"$(nproc)" "$ext"; then
+		echo "Failed to install extension: $ext" >&2
+		exit 1
+	fi
+done
 pear install mail
 pear install net_smtp
 

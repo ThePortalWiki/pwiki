@@ -1,4 +1,4 @@
-FROM php:7-fpm
+FROM php:8-fpm
 
 # You can change this value to invalidate the Docker build cache and force a rebuild.
 ARG REBUILD=1
