@@ -1,4 +1,6 @@
 all:
   hosts:
+    pwiki_prod:
+      ansible_host: prod.theportalwiki.com
     pwiki_dev:
       ansible_host: dev.theportalwiki.com

@@ -18,7 +18,6 @@
     name:
       - curl
       - python
-      - python2
       - sudo
       - screen
       - htop

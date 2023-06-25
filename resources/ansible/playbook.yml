@@ -1,3 +1,11 @@
+- name: pwiki_prod
+  hosts:
+    - pwiki_prod
+  remote_user: root
+  roles:
+    - pwiki
+  vars:
+    pwiki_domain: theportalwiki.com
 - name: pwiki_dev
   hosts:
     - pwiki_dev
