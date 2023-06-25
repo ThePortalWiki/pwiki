@@ -206,6 +206,18 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
   $wgLoadScript = 'https://'.$cdnDomain2.'/js.png';
   $wgStylePath = 'https://'.$cdnDomain2.'/w/skins';
   $wgLogo = 'https://'.$cdnDomain2.'/img/3/3b/Wiki_logo.png';
+  $wgFooterIcons['poweredby']['gvisor'] = [
+    "src" => 'https://'.$cdnDomain2.'/w/static/served_by_gvisor/served_by_gvisor.1x.png',
+    "url" => "https://gvisor.dev/",
+    "alt" => "Securely served by gVisor",
+    "srcset" =>
+      'https://'.$cdnDomain2.'/w/static/served_by_gvisor/served_by_gvisor.1_5x.png 1.5x, ' .
+      'https://'.$cdnDomain2.'/w/static/served_by_gvisor/served_by_gvisor.2x.png 2x, ' .
+      'https://'.$cdnDomain2.'/w/static/served_by_gvisor/served_by_gvisor.3x.png 3x, ' .
+      'https://'.$cdnDomain2.'/w/static/served_by_gvisor/served_by_gvisor.4x.png 4x, ' .
+      'https://'.$cdnDomain2.'/w/static/served_by_gvisor/served_by_gvisor.6x.png 6x, ' .
+      'https://'.$cdnDomain2.'/w/static/served_by_gvisor/served_by_gvisor.8x.png 8x',
+  ];
 
   # Namespace aliases
   $wgNamespaceAliases['P'] = NS_PROJECT;
