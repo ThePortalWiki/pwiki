@@ -2,7 +2,7 @@ diff --git a/w/extensions/EmbedVideo/EmbedVideo.hooks.php b/w/extensions/EmbedVi
 index 0fb64d3..7df3301 100644
 --- a/w/extensions/EmbedVideo/EmbedVideo.hooks.php
 +++ b/w/extensions/EmbedVideo/EmbedVideo.hooks.php
-@@ -70,16 +70,14 @@ class EmbedVideoHooks {
+@@ -70,16 +70,16 @@ class EmbedVideoHooks {
  	 * @return	void
  	 */
  	public static function onExtension() {
@@ -10,6 +10,8 @@ index 0fb64d3..7df3301 100644
 -
 -		$config = ConfigFactory::getDefaultInstance()->makeConfig('main');
 +		global $wgEmbedVideoDefaultWidth, $wgMediaHandlers, $wgFileExtensions, $wgEmbedVideoEnableAudioHandler, $wgEmbedVideoEnableVideoHandler, $wgEmbedVideoAddFileExtensions;
++
++
  
  		if (!isset($wgEmbedVideoDefaultWidth) && (isset($_SERVER['HTTP_X_MOBILE']) && $_SERVER['HTTP_X_MOBILE'] == 'true') && $_COOKIE['stopMobileRedirect'] != 1) {
  			//Set a smaller default width when in mobile view.
