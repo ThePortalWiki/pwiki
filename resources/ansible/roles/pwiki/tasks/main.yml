@@ -308,3 +308,10 @@
     daemon_reload: "{{ packages.changed }}"
     enabled: yes
     state: "{{ 'restarted' if setup_letsencrypt_cron.changed or setup_backups.changed or setup_bot_cron.changed else 'started' }}"
+- name: Set hostname
+  ansible.builtin.copy:
+    content: "{{ server_etchostname }}"
+    dest: /etc/hostname
+    owner: root
+    group: root
+    mode: '0644'

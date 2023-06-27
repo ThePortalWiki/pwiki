@@ -5,6 +5,7 @@
   roles:
     - pwiki
   vars:
+    server_etchostname: pwikiprod
     pwiki_domain: theportalwiki.com
 - name: pwiki_dev
   hosts:
@@ -13,4 +14,5 @@
   roles:
     - pwiki
   vars:
+    server_etchostname: pwikidev
     pwiki_domain: dev.theportalwiki.com
