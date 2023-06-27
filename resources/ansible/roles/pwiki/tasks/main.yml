@@ -106,6 +106,8 @@
     recursive: yes
     rsync_opts:
       - "--chown={{ pwiki_uid }}:{{ pwiki_gid }}"
+      - '--exclude=*/backups/encryption-key.passphrase.fragments'
+      - '--delete-after'
   register: repo
 - name: Check pre-existence of backup file
   stat:
