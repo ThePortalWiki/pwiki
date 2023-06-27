@@ -34,7 +34,7 @@ user=$READONLY_USER
 password=$READONLY_PASSWORD
 EOF
 tempDump="/backups/.$BACKUP_FILE.partial.$RANDOM.tmp"
-mysqldump --defaults-file="$tempConfig"             \
+mariadb-dump --defaults-file="$tempConfig"          \
     --single-transaction --quick --extended-insert  \
     --max_allowed_packet=64M -h pwiki-mariadb       \
     --all-databases --all-tablespaces > "$tempDump"

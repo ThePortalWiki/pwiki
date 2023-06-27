@@ -69,15 +69,15 @@ echo "Selected database backup file: '$latestDatabaseBackup' ($(howOld "$backupA
 tmpDir="$(mktemp -d)"
 export GNUPGHOME="$tmpDir/.gnupg"
 mkdir -m700 "$GNUPGHOME"
-gpg --batch --quiet --import < "$BACKUP_GNUPG_SIGNING_PRIVATE_KEY_FILE" 2>/dev/null || echo 'GnuPG error while importing signing key.' >&2
+gpg --batch --quiet --import < "$BACKUP_GNUPG_SIGNING_PRIVATE_KEY_FILE"   2>/dev/null || echo 'GnuPG error while importing signing key.'           >&2
 gpg --batch --quiet --import < "$BACKUP_GNUPG_ENCRYPTION_PUBLIC_KEY_FILE" 2>/dev/null || echo 'GnuPG error while importing encryption public key.' >&2
 
 echo 'Streaming backup file...' >&2
 tar --create --file=- --xz --one-file-system                                             \
   --warning=no-file-changed --exclude='*/thumb/*' --exclude='*/temp/*'                   \
-  --directory="$(dirname "$SECRETS_FILE")" "$(basename "$SECRETS_FILE")" \
+  --directory="$(dirname "$SECRETS_FILE")"         "$(basename "$SECRETS_FILE")"         \
   --directory="$(dirname "$latestDatabaseBackup")" "$(basename "$latestDatabaseBackup")" \
-  --directory="$(dirname "$REPO_DIR")" "$(basename "$REPO_DIR")" \
+  --directory="$(dirname "$REPO_DIR")"             "$(basename "$REPO_DIR")"             \
   --directory="$(dirname "$IMAGES_DIR")"           "$(basename "$IMAGES_DIR")" |         \
 gpg --batch --quiet                                                                      \
   --sign --local-user="$BACKUP_GNUPG_SIGNING_KEY"                                        \

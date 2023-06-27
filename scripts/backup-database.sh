@@ -33,6 +33,8 @@ docker build --quiet                              \
     --tag="$backupContainerName"                  \
     "$imagesDir/$backupContainerName" > /dev/null
 
+docker rm -f "$backupContainerName" &>/dev/null || true
+
 docker run --rm --name="$backupContainerName"     \
     --volume="$SECRETS_DIR:/pwiki-secrets"        \
     --volume="$(dirname "$BACKUP_FILE"):/backups" \
