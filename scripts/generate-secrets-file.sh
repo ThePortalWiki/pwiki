@@ -37,7 +37,7 @@ generate_bot_config() {
 # -*- coding: utf-8 -*-
 
 config = {
-        'api': 'http://127.0.0.1:8077/w/api.php', # Wiki API URL
+        'api': 'http://127.0.0.1:3333/w/api.php', # Wiki API URL
         'steamAPI': '$STEAM_API_KEY', # Steam API key
         'username': '$WINDBOT_USER', # Username
         'password': '$WINDBOT_PASSWORD', # Password

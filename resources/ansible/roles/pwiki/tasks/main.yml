@@ -54,7 +54,6 @@
   loop:
     - {name: 'pwiki', uid: "{{ pwiki_uid }}"}
     - {name: 'pwikibackup', uid: "{{ pwikibackup_uid }}"}
-    - {name: 'pwikibot', uid: "{{ pwikibot_uid }}"}
 - name: Add nginx user to pwiki group
   ansible.builtin.user:
     name: http
@@ -209,16 +208,18 @@
   loop:
     - /etc/nginx
     - /etc/nginx/conf
+    - /etc/systemd/system/nginx.service.d
 - name: Set up nginx configuration
   ansible.builtin.template:
     src: "{{ role_path }}/templates/nginx/{{ item.template }}"
-    dest: "/etc/nginx/{{ item.path }}"
+    dest: "{{ item.path }}"
     owner: root
     group: root
     mode: '0644'
   loop:
-    - {template: 'nginx.conf.j2', path: 'nginx.conf'}
-    - {template: 'pwiki.conf.j2', path: "conf/{{ pwiki_domain }}.conf"}
+    - {template: 'nginx.conf.j2', path: '/etc/nginx/nginx.conf'}
+    - {template: 'pwiki.conf.j2', path: "/etc/nginx/conf/{{ pwiki_domain }}.conf"}
+    - {template: 'remove-wiki-sock.conf.j2', path: "/etc/systemd/system/nginx.service.d/remove-wiki-sock.conf"}
   register: nginx_configuration
 - name: Set up SSL certificate directories
   ansible.builtin.file:
@@ -280,26 +281,12 @@
       - /home/pwiki/pwiki/scripts/setup-backups.sh
       - /etc/pwiki/pwiki-secrets
   register: setup_backups
-- name: Download bot repository
-  ansible.builtin.git:
-    repo: 'https://github.com/EtiennePerot/mrgusty'
-    recursive: yes
-    dest: /home/pwikibot/bot
-    version: master
-- name: Copy bot configuration file
-  ansible.builtin.copy:
-    src: /etc/pwiki/pwiki-secrets/botConfig.py
-    remote_src: yes
-    dest: /home/pwikibot/bot/botConfig.py
-    owner: pwikibot
-    group: pwiki
-    mode: '0400'
 - name: Set up bot cron job
   ansible.builtin.cron:
     name: "pwiki_bot_{{ pwiki_domain }}"
     special_time: hourly
-    user: pwikibot
-    job: /home/pwikibot/bot/bot.py
+    user: root
+    job: "/home/pwiki/pwiki/scripts/run-bot.sh /etc/pwiki/pwiki-secrets"
   register: setup_bot_cron
 - name: Start up cronie
   ansible.builtin.systemd:

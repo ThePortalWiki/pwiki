@@ -45,5 +45,5 @@ while true; do
 	break
 done
 
-"$RUNSC_PATH" install
+"$RUNSC_PATH" install -- --host-uds=all
 systemctl restart docker

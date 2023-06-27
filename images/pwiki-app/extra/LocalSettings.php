@@ -227,8 +227,14 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
   $wgGroupPermissions['*']['createpage'] = false;
   $wgGroupPermissions['*']['createtalk'] = false;
   $wgGroupPermissions['*']['edit'] = false;
-  $wgGroupPermissions['*']['writeapi'] = false;
-  
+  # For some reason this needs to be enabled on the "*" group for the bot to
+  # be able to use it. The MediaWiki manual states that this makes no sense
+  # without the "edit" right, which "*" doesn't have, yet setting this to
+  # "false" will break the bot.
+  # Yes, even if the bot role has both "edit" and "writeapi".
+  $wgGroupPermissions['*']['writeapi'] = true;
+
+  $wgGroupPermissions['user']['edit'] = true;
   $wgGroupPermissions['user']['move'] = true;
   $wgGroupPermissions['user']['move-rootuserpages'] = false;
   $wgGroupPermissions['user']['move-subpages'] = true;
@@ -261,7 +267,8 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
   $wgGroupPermissions['bot']['bot'] = true;
   $wgGroupPermissions['bot']['apihighlimits'] = true;
   $wgGroupPermissions['bot']['noratelimit'] = true;
-  
+  $wgGroupPermissions['bot']['writeapi'] = true;
+
   $wgGroupPermissions['sysop'] = $wgGroupPermissions['Moderators'];
   $wgGroupPermissions['sysop']['blockemail'] = true;
   $wgGroupPermissions['sysop']['editinterface'] = true;
