@@ -34,3 +34,7 @@
 [submodule "resources/backups/python-utilitybelt"]
 	path = resources/backups/python-utilitybelt
 	url = https://github.com/ThePortalWiki/python-utilitybelt
+[submodule "images/pwiki-bot/mrgusty"]
+	path = images/pwiki-bot/mrgusty
+	url = https://github.com/EtiennePerot/mrgusty
+	branch = master
