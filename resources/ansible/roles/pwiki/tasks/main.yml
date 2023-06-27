@@ -198,6 +198,20 @@
       - /home/pwiki/pwiki/scripts/setup-mediawiki.sh
       - '--batch'
       - "{{ mediawiki_release_url }}"
+- name: Create MediaWiki systemd service
+  ansible.builtin.template:
+    src: "{{ role_path }}/templates/wiki.service.j2"
+    dest: "/etc/systemd/system/wiki.service"
+    owner: root
+    group: root
+    mode: '0644'
+  register: mediawiki_systemd_service
+- name: Enable MediaWiki systemd service
+  ansible.builtin.systemd:
+    name: wiki.service
+    daemon_reload: "{{ mediawiki_systemd_service.changed }}"
+    enabled: yes
+    state: started
 - name: Set up nginx configuration directory
   ansible.builtin.file:
     state: directory

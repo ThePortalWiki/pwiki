@@ -26,6 +26,7 @@ MEDIAWIKI_TESTROOT="$WEBROOT_PRIVATE/w.new"
 MEDIAWIKI_IMAGES_MOUNTPOINT="$MEDIAWIKI_PRODROOT/images"
 ETC_DIR=/etc/pwiki
 SECRETS_DIR="$ETC_DIR/pwiki-secrets"
+LATEST_GOOD_RELEASE_FILE="$ETC_DIR/last-release.url"
 ROOT_URL='https://theportalwiki.com'
 GNUPG_KEYS='https://www.mediawiki.org/keys/keys.txt'
 PHP_FPM_BIND_HOSTPORT=127.0.0.1:3777
@@ -55,6 +56,11 @@ for arg; do
 done
 if [[ -z "$currentRelease" ]]; then
 	echo "Must specify MediaWiki release." >&2
+	exit 1
+fi
+
+if ! docker inspect "$CONTAINER_DATABASE_NAME" &>/dev/null; then
+	echo "Database container $CONTAINER_DATABASE_NAME does not exist." >&2
 	exit 1
 fi
 
@@ -207,4 +213,5 @@ else
 	fi
 	echo 'Release OK. Proceeding with upgrade.'
 fi
+echo "$currentRelease" > "$LATEST_GOOD_RELEASE_FILE"
 rm -rf --one-file-system "$MEDIAWIKI_PRODROOT_BACKUP"

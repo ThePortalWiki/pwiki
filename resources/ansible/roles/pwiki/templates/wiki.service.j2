@@ -1,0 +1,14 @@
+[Unit]
+Description=MediaWiki container for {{ pwiki_domain }}
+Wants=docker.service
+After=docker.service
+After=network.target
+
+[Service]
+ExecStart=/home/pwiki/pwiki/scripts/rerun-after-reboot.sh
+Type=oneshot
+RemainAfterExit=true
+StandardOutput=journal
+
+[Install]
+WantedBy=multi-user.target
