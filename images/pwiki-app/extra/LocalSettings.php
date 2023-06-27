@@ -164,6 +164,7 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
   if(function_exists('wfLoadSkin')) {
     # MediaWiki 1.25+
     wfLoadSkin('Vector');
+    wfLoadSkin('MonoBook');
   } else if (file_exists("$IP/skins/Vector/Vector.php")) {
     # MediaWiki 1.24
     require_once("$IP/skins/Vector/Vector.php");
