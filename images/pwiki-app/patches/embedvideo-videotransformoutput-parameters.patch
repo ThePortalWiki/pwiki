@@ -1,0 +1,12 @@
+diff --git a/w/extensions/EmbedVideo/classes/media/VideoTransformOutput.php b/w/extensions/EmbedVideo/classes/media/VideoTransformOutput.php
+index 0fb64d3..7b53efd 100644
+--- a/w/extensions/EmbedVideo/classes/media/VideoTransformOutput.php
++++ b/w/extensions/EmbedVideo/classes/media/VideoTransformOutput.php
+@@ -13,6 +13,7 @@
+ namespace EmbedVideo;
+ 
+ class VideoTransformOutput extends \MediaTransformOutput {
++	public $parameters;
+ 	/**
+ 	 * Main Constructor
+ 	 *
