@@ -77,6 +77,7 @@ RECAPTCHA_PRIVATE_KEY=something
 WINDBOT_USER=WindBOT
 WINDBOT_PASSWORD=something
 STEAM_API_KEY=something
+RCNOTIFY_URL='https://irc.biringa.com/something.php?shapass=somethingelse'
 ```
 
 Then remove every other file in `/etc/pwiki/pwiki-secrets/` and run the Ansible playbook again. Ansible will create other files in the same directory that are consumed by other parts of the setup.

@@ -58,6 +58,18 @@ config = {
         }
 }
 
+rcNotifyConfig = {
+        'wikiUrl': 'http://127.0.0.1:3333/w/api.php',
+        'notifyUrl': '$RCNOTIFY_URL',
+        'refreshRatePage': 'User:WindPower/RCNotifyRefreshRate',
+        'refreshRate': 5, # Default refresh rate in seconds. Put "None" to use the one on the wiki, or put your custom value here to override it.
+        'blogRefresh': 3, # The blog will be checked every 3 RC checks
+        'rcLimit': 500, # Check for the last n RCs on every request (max: 500)
+        'rcSubmitLimit': 10, # Max number of RCs to submit in one request
+        'httpTimeout': 30, # Timeout in seconds for all web requests
+        'via': 'Leetle' # Put your username here in single quotes (like this: 'via': 'LolUser'), or put None to stay anonymous
+}
+
 EOF
 }
 
