@@ -133,7 +133,8 @@ It also bundles some more functionality to make MediaWiki work properly:
 
 * `imagemagick` for MediaWiki's ImageMagick resizing support
 * `msmtp` to send email through Gmail via SMTP
-* TODO: Add some opcode caching thing as well
+* All the PHP extensions necessary to make MediaWiki work
+* APCu for object caching by MediaWiki's cache to make it faster
 
 Container build arguments:
 
