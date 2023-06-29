@@ -68,7 +68,6 @@ def getNotifyResponse(params):
 		params = u(urllib.urlencode(params))
 	if config['via'] is not None:
 		params += '&via=' + u(urlEncode(config['via']))
-	print('>>> Notifying URL', notifyUrl, 'with params:', params)
 	response = urllib2.urlopen(notifyUrl, params, timeout=httpTimeout).read(-1)
 	print 'Response:', response
 	return response

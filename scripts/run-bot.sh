@@ -8,6 +8,7 @@ socketFile='/run/wiki.sock'
 botContainerName='pwiki-bot'
 
 SECRETS_DIR="$1"
+shift
 if [ ! -e "$SECRETS_DIR/botConfig.py" ]; then
 	echo "Secrets directory '$SECRETS_DIR' does not contain the expected botConfig.py." >&2
 	exit 1
@@ -28,4 +29,4 @@ docker run --rm \
     --runtime=runsc                    \
     --volume="$socketFile:/wiki.sock"  \
     --volume="$SECRETS_DIR/botConfig.py:/botConfig/botConfig.py"  \
-    "$botContainerName"
+    "$botContainerName" "$@"
