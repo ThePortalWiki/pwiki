@@ -302,12 +302,23 @@
     user: root
     job: "/home/pwiki/pwiki/scripts/run-bot.sh /etc/pwiki/pwiki-secrets"
   register: setup_bot_cron
+- name: Set up periodic reboot job
+  ansible.builtin.cron:
+    name: "reboot"
+    month: '*'
+    weekday: '*'
+    day: '7'
+    hour: '5'
+    minute: '0'
+    user: root
+    job: "/usr/bin/reboot"
+  register: setup_reboot_cron
 - name: Start up cronie
   ansible.builtin.systemd:
     name: cronie.service
     daemon_reload: "{{ packages.changed }}"
     enabled: yes
-    state: "{{ 'restarted' if setup_letsencrypt_cron.changed or setup_backups.changed or setup_bot_cron.changed else 'started' }}"
+    state: "{{ 'restarted' if setup_letsencrypt_cron.changed or setup_backups.changed or setup_bot_cron.changed or setup_reboot_cron.changed else 'started' }}"
 - name: Set hostname
   ansible.builtin.copy:
     content: "{{ server_etchostname }}"
