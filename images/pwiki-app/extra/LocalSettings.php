@@ -298,6 +298,8 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
 
   # Allow these extra file types for uploads
   $wgFileExtensions = array('png', 'jpg', 'jpeg', 'gif', 'ogg', 'wav', 'txt', 'mp3', 'psd', 'ogv', 'avi', 'flac', 'mpg', 'mp4', 'm4a', 'm4r', 'mkv', 'ttf', 'otf', 'eot', '7z', 'dem', 'cfg', 'diff', 'svg');
+  # Larger files.
+  $wgMaxUploadSize = 32 * 1024 * 1024; // 32 MiB
 
   # MIME type checking
   $wgVerifyMimeType = false;

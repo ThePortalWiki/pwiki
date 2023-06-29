@@ -17,6 +17,10 @@ pear install net_smtp
 pecl install -f apcu-5.1.22 </dev/null
 docker-php-ext-enable apcu --ini-name 10-docker-php-ext-apcu.ini
 
+# PHP settings
+echo "upload_max_filesize = $(( 32 * 1024 * 1024 ))" >> "$PHP_INI_DIR/conf.d/php-wiki.ini"
+echo "post_max_size = $(( 33 * 1024 * 1024 ))" >> "$PHP_INI_DIR/conf.d/php-wiki.ini"
+
 WIKI_UID="$(echo "$WIKI_UIDGID" | cut -d: -f1)"
 WIKI_GID="$(echo "$WIKI_UIDGID" | cut -d: -f2)"
 if ! echo "$WIKI_UID" | grep -qP '^[0-9]+$'; then
