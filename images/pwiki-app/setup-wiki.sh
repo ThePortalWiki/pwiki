@@ -18,6 +18,7 @@ pecl install -f apcu-5.1.22 </dev/null
 docker-php-ext-enable apcu --ini-name 10-docker-php-ext-apcu.ini
 
 # PHP settings
+mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 echo "upload_max_filesize = $(( 32 * 1024 * 1024 ))" >> "$PHP_INI_DIR/conf.d/php-wiki.ini"
 echo "post_max_size = $(( 33 * 1024 * 1024 ))" >> "$PHP_INI_DIR/conf.d/php-wiki.ini"
 
