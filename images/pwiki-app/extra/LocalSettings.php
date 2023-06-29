@@ -164,6 +164,7 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
   if(function_exists('wfLoadSkin')) {
     # MediaWiki 1.25+
     wfLoadSkin('Vector');
+    wfLoadSkin('MonoBook');
   } else if (file_exists("$IP/skins/Vector/Vector.php")) {
     # MediaWiki 1.24
     require_once("$IP/skins/Vector/Vector.php");
@@ -242,7 +243,6 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
   
   $wgGroupPermissions['autoconfirmed']['skipcaptcha'] = true;
   
-  $wgGroupPermissions['Moderators'] = $wgGroupPermissions['user'];
   $wgGroupPermissions['Moderators']['move'] = true;
   $wgGroupPermissions['Moderators']['move-subpages'] = true;
   $wgGroupPermissions['Moderators']['movefile'] = true;
@@ -262,14 +262,13 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
   $wgGroupPermissions['Moderators']['skipcaptcha'] = true;
   $wgGroupPermissions['Moderators']['editprotected'] = true;
   $wgGroupPermissions['Moderators']['editsemiprotected'] = true;
+  $wgGroupPermissions['Moderators']['rollback'] = true;
   
-  $wgGroupPermissions['bot'] = $wgGroupPermissions['Moderators'];
   $wgGroupPermissions['bot']['bot'] = true;
   $wgGroupPermissions['bot']['apihighlimits'] = true;
   $wgGroupPermissions['bot']['noratelimit'] = true;
   $wgGroupPermissions['bot']['writeapi'] = true;
 
-  $wgGroupPermissions['sysop'] = $wgGroupPermissions['Moderators'];
   $wgGroupPermissions['sysop']['blockemail'] = true;
   $wgGroupPermissions['sysop']['editinterface'] = true;
   $wgGroupPermissions['sysop']['import'] = true;
@@ -281,7 +280,6 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
   $wgGroupPermissions['sysop']['unwatchedpages'] = true;
   $wgGroupPermissions['sysop']['ipblock-exempt'] = true;
   
-  $wgGroupPermissions['bureaucrat'] = $wgGroupPermissions['sysop'];
   $wgGroupPermissions['bureaucrat']['userrights'] = true;
   $wgGroupPermissions['bureaucrat']['usermerge'] = true;
   
