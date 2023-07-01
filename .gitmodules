@@ -25,9 +25,6 @@
 [submodule "extra/extensions/LangUtils"]
 	path = images/pwiki-app/extra/extensions/LangUtils
 	url = https://github.com/ThePortalWiki/LangUtils
-[submodule "extra/extensions/EmbedVideo"]
-	path = images/pwiki-app/extra/extensions/EmbedVideo
-	url = https://gitlab.com/hydrawiki/extensions/EmbedVideo.git
 [submodule "resources/backups/secret-sharing"]
 	path = resources/backups/secret-sharing
 	url = https://github.com/ThePortalWiki/secret-sharing
@@ -38,3 +35,6 @@
 	path = images/pwiki-bot/mrgusty
 	url = https://github.com/EtiennePerot/mrgusty
 	branch = master
+[submodule "images/pwiki-app/extra/extensions/EmbedVideo"]
+	path = images/pwiki-app/extra/extensions/EmbedVideo
+	url = https://github.com/StarCitizenWiki/mediawiki-extensions-EmbedVideo.git
