@@ -187,6 +187,7 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
 
   # Enable object caching with APCu:
   $wgMainCacheType = CACHE_ACCEL;
+  $wgSessionCacheType = CACHE_DB;
 
   # Enable subpages in certain namespaces (necessary for translation switching)
   $wgNamespacesWithSubpages[NS_MAIN]     = true;
