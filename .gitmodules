@@ -38,3 +38,6 @@
 [submodule "images/pwiki-app/extra/extensions/EmbedVideo"]
 	path = images/pwiki-app/extra/extensions/EmbedVideo
 	url = https://github.com/StarCitizenWiki/mediawiki-extensions-EmbedVideo.git
+[submodule "images/pwiki-app/extra/skins/Citizen"]
+	path = images/pwiki-app/extra/skins/Citizen
+	url = https://github.com/StarCitizenTools/mediawiki-skins-Citizen.git

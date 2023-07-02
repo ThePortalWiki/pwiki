@@ -164,6 +164,7 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
   if(function_exists('wfLoadSkin')) {
     # MediaWiki 1.25+
     wfLoadSkin('Vector');
+    wfLoadSkin('Citizen');
   } else if (file_exists("$IP/skins/Vector/Vector.php")) {
     # MediaWiki 1.24
     require_once("$IP/skins/Vector/Vector.php");
@@ -339,6 +340,10 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
 
   if (function_exists('wfLoadExtension')) { wfLoadExtension('CodeEditor'); } else { require_once( "$IP/extensions/CodeEditor/CodeEditor.php" ); }
   if (function_exists('wfLoadExtension')) { wfLoadExtension('Cite'); } else { require_once( "$IP/extensions/Cite/Cite.php" ); }
+  if (function_exists('wfLoadExtension')) {
+    wfLoadExtension('MobileFrontend');
+    $wgDefaultMobileSkin = 'citizen';
+  }
 
   # RedditThumbnail was not updated to extension.json. TODO
   #if (function_exists('wfLoadExtension')) { wfLoadExtension('RedditThumbnail'); } else { require_once( "$IP/extensions/RedditThumbnail/RedditThumbnail.php" ); }

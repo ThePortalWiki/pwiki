@@ -1,4 +1,4 @@
-FROM php:8-fpm
+FROM php:8.1-fpm
 
 # You can change this value to invalidate the Docker build cache and force a rebuild.
 ARG REBUILD=1
@@ -16,8 +16,9 @@ COPY install-mediawiki.sh extra-keys.asc /
 RUN chmod 555 /install-mediawiki.sh && sudo -u pwiki --preserve-env --set-home /install-mediawiki.sh && rm /install-mediawiki.sh /extra-keys.asc
 RUN rm -rf --one-file-system /extra
 
-COPY patches /patches
-RUN chown -R pwiki:pwiki /patches
+# Uncomment if we need any patching and there is at least one *.patch file:
+# COPY patches /patches
+# RUN chown -R pwiki:pwiki /patches
 
 # Volume handling.
 RUN mkdir /pwiki /pwiki-secrets /home/pwiki/www/w/images /home/pwiki/www-private/cache && touch /pwiki/no-volume /pwiki-secrets/no-volume /home/pwiki/www/w/images/no-volume && chown pwiki:pwiki /home/pwiki/www/w/images /home/pwiki/www-private/cache

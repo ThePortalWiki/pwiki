@@ -15,7 +15,7 @@ cp /pwiki-secrets/smtp-password ~pwiki/www-private/smtp-password
 chown -R pwiki:pwiki ~pwiki/www-private
 
 pushd ~pwiki/www &>/dev/null
-	if [[ "$(ls -1 /patches | grep -P '\.patch$' | wc -l)" -gt 0 ]]; then
+	if [[ -d /patches ]] && [[ "$(ls -1 /patches | grep -P '\.patch$' | wc -l)" -gt 0 ]]; then
 		for patch in /patches/*.patch; do
 			patch -p1 < "$patch"
 		done
