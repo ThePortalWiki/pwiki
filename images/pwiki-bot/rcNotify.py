@@ -58,7 +58,7 @@ def u(s):
 def urlEncode(s):
 	encoded = urllib2.quote(urllib2.unquote(eval(u(s).encode('utf8').__repr__().replace('\\x', '%'))))
 	encoded = encoded.replace('head%20', 'head_')
-	encoded = encoded.replace('%7B', '').replace('%7D', '')
+	encoded = encoded.replace('%7B', '').replace('%7D', '').replace('%22', '')
 	return encoded
 def getNotifyResponse(params):
 	global notifyUrl, config, httpTimeout
@@ -150,8 +150,8 @@ def checkForRCs():
 		rc = reviewRC(rc)
 		if rc is not None:
 			allParams.append(rc)
-	allParams = allParams[:min(config['rcSubmitLimit'], len(allParams))]
-	response = getNotifyResponse(multiUrlEncode(allParams))
+	for i in range(min(config['rcSubmitLimit'], len(allParams))):
+		response = getNotifyResponse(multiUrlEncode([allParams[i]]))
 	updateLastRC(response)
 def main(once=False):
 	global refreshRate, config
