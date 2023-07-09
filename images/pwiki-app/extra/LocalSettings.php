@@ -11,6 +11,7 @@ if(isset($_SERVER['HTTP_HOST']) && substr_compare($_SERVER['HTTP_HOST'], '.net',
 }
 
 set_time_limit(120);
+ini_set('memory_limit', '512M');
 # ----- DEBUG SETTINGS
 set_time_limit(0);
 #error_reporting(E_ERROR | E_PARSE);  # Hide warnings

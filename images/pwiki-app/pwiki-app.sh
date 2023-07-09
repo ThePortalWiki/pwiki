@@ -54,7 +54,7 @@ popd &>/dev/null
 # Unfortunately PHP just leaks memory over time, so we need to restart
 # the workers every once in a while.
 bash -c 'while true; do php-fpm; done' &
-bash -c 'while true; do sleep 6h; pkill php-fpm; done' &
+bash -c 'while true; do sleep 5h; pkill php-fpm; done' &
 
 # Run MediaWiki jobs every once in a while.
 sudo -u pwiki bash -c 'cd "$HOME/www/w"; sleep 3m; while true; do php maintenance/runJobs.php --maxjobs 10; sleep 5m; done' &
