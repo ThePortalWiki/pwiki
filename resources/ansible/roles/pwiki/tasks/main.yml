@@ -295,6 +295,13 @@
       - /home/pwiki/pwiki/scripts/setup-backups.sh
       - /etc/pwiki/pwiki-secrets
   register: setup_backups
+- name: Set hostname
+  ansible.builtin.copy:
+    content: "{{ server_etchostname }}"
+    dest: /etc/hostname
+    owner: root
+    group: root
+    mode: '0644'
 - name: Set up bot cron job
   ansible.builtin.cron:
     name: "pwiki_bot_{{ pwiki_domain }}"
@@ -304,25 +311,40 @@
   register: setup_bot_cron
 - name: Set up periodic reboot job
   ansible.builtin.cron:
-    name: "reboot"
+    name: 'reboot'
     month: '*'
     weekday: '*'
-    day: '7'
+    day: '*/3'
     hour: '5'
-    minute: '0'
+    minute: '17'
     user: root
-    job: "/usr/bin/reboot"
+    job: '/usr/bin/reboot'
   register: setup_reboot_cron
+- name: Set up periodic local healthcheck job
+  ansible.builtin.cron:
+    name: 'healthcheck_local'
+    month: '*'
+    weekday: '*'
+    day: '*'
+    hour: '*'
+    minute: '*/10'
+    user: root
+    job: "/home/pwiki/pwiki/scripts/healthcheck.sh --local"
+  register: setup_local_healthcheck_cron
+- name: Set up periodic remote healthcheck job
+  ansible.builtin.cron:
+    name: 'healthcheck_remote'
+    month: '*'
+    weekday: '*'
+    day: '*'
+    hour: '*'
+    minute: '23'
+    user: root
+    job: "/home/pwiki/pwiki/scripts/healthcheck.sh --remote {{ pwiki_domain }}"
+  register: setup_remote_healthcheck_cron
 - name: Start up cronie
   ansible.builtin.systemd:
     name: cronie.service
     daemon_reload: "{{ packages.changed }}"
     enabled: yes
-    state: "{{ 'restarted' if setup_letsencrypt_cron.changed or setup_backups.changed or setup_bot_cron.changed or setup_reboot_cron.changed else 'started' }}"
-- name: Set hostname
-  ansible.builtin.copy:
-    content: "{{ server_etchostname }}"
-    dest: /etc/hostname
-    owner: root
-    group: root
-    mode: '0644'
+    state: "{{ 'restarted' if setup_letsencrypt_cron.changed or setup_backups.changed or setup_bot_cron.changed or setup_reboot_cron.changed or setup_local_healthcheck_cron.changed or setup_remote_healthcheck_cron.changed else 'started' }}"
