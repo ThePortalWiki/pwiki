@@ -342,9 +342,20 @@
     user: root
     job: "/home/pwiki/pwiki/scripts/healthcheck.sh --remote {{ pwiki_domain }}"
   register: setup_remote_healthcheck_cron
+- name: Set up regular maintenance job
+  ansible.builtin.cron:
+    name: 'regular_maintenance'
+    month: '*'
+    weekday: '*'
+    day: '*/5'
+    hour: '6'
+    minute: '17'
+    user: root
+    job: '/home/pwiki/pwiki/scripts/regular-maintenance.sh'
+  register: setup_regular_maintenance_cron
 - name: Start up cronie
   ansible.builtin.systemd:
     name: cronie.service
     daemon_reload: "{{ packages.changed }}"
     enabled: yes
-    state: "{{ 'restarted' if setup_letsencrypt_cron.changed or setup_backups.changed or setup_bot_cron.changed or setup_reboot_cron.changed or setup_local_healthcheck_cron.changed or setup_remote_healthcheck_cron.changed else 'started' }}"
+    state: "{{ 'restarted' if setup_letsencrypt_cron.changed or setup_backups.changed or setup_bot_cron.changed or setup_reboot_cron.changed or setup_local_healthcheck_cron.changed or setup_remote_healthcheck_cron.changed or setup_regular_maintenance_cron.changed else 'started' }}"
