@@ -166,6 +166,7 @@
     interactive: no
     privileged: no
     read_only: no
+    runtime: runc
     tty: no
     restart_policy: unless-stopped
     image: pwiki-mariadb:pwiki-mariadb
