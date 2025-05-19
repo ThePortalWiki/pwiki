@@ -209,6 +209,7 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
   $wgLoadScript = 'https://'.$cdnDomain2.'/js.png';
   $wgStylePath = 'https://'.$cdnDomain2.'/w/skins';
   $wgLogo = 'https://'.$cdnDomain2.'/img/3/3b/Wiki_logo.png';
+  $wgFavicon = '/img/a/ab/Wiki_icon.png';
   $wgFooterIcons['poweredby']['gvisor'] = [
     "src" => 'https://'.$cdnDomain2.'/w/static/served_by_gvisor/served_by_gvisor.1x.png',
     "url" => "https://gvisor.dev/",
