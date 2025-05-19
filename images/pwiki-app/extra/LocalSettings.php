@@ -265,6 +265,7 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
   $wgGroupPermissions['Moderators']['skipcaptcha'] = true;
   $wgGroupPermissions['Moderators']['editprotected'] = true;
   $wgGroupPermissions['Moderators']['editsemiprotected'] = true;
+  $wgGroupPermissions['Moderators']['renameuser'] = true;
   
   $wgGroupPermissions['bot'] = $wgGroupPermissions['Moderators'];
   $wgGroupPermissions['bot']['bot'] = true;
