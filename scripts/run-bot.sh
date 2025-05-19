@@ -4,7 +4,7 @@ set -euo pipefail
 
 repoDir="$(dirname "${BASH_SOURCE[0]}")/.."
 imagesDir="$repoDir/images"
-socketFile='/run/wiki.sock'
+socketFile='/run/pwiki/wiki.sock'
 botContainerName='pwiki-bot'
 
 SECRETS_DIR="$1"

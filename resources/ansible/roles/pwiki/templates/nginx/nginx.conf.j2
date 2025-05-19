@@ -23,5 +23,7 @@ http {
         gzip_buffers    16 8k;
         gzip_vary       on;
         gzip_types      text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+        types_hash_max_size    65536;
+        types_hash_bucket_size 256;
         include /etc/nginx/conf/*.conf;
 }

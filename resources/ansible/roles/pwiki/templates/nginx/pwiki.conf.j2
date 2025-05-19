@@ -11,45 +11,71 @@ server {
 	add_header Access-Control-Allow-Origin *;
 
 	root  /home/pwiki/www;
-	location / {
-		rewrite ^/+$ /wiki/Main_Page permanent;
-		error_page 404 = @mediawiki;
+	location = /js.png {
+		proxy_set_header Host              $host;
+		proxy_set_header X-Real-IP         $remote_addr;
+		proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+		proxy_set_header X-Forwarded-Proto https;
+		proxy_pass       http://pwiki-direct;
 	}
-	location @mediawiki {
-		rewrite ^/wiki/*$                   /w/index.php?title=Main_Page last;
-		rewrite ^/wiki/([^?]*)(?:\?(.*))?$  /w/index.php?title=$1&$2 last;
+	location = /favicon.ico {
+		proxy_set_header Host              $host;
+		proxy_set_header X-Real-IP         $remote_addr;
+		proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+		proxy_set_header X-Forwarded-Proto https;
+		proxy_pass       http://pwiki-direct;
+	}
+	location = /sitemap.xml {
+		proxy_set_header Host              $host;
+		proxy_set_header X-Real-IP         $remote_addr;
+		proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+		proxy_set_header X-Forwarded-Proto https;
+		proxy_pass       http://pwiki-direct;
+	}
+	location / {
+		proxy_set_header Host              $host;
+		proxy_set_header X-Real-IP         $remote_addr;
+		proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+		proxy_set_header X-Forwarded-Proto https;
+		proxy_pass       http://pwiki-firewall;
+	}
+	location /w/images/ {
+		proxy_set_header Host              $host;
+		proxy_set_header X-Real-IP         $remote_addr;
+		proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+		proxy_set_header X-Forwarded-Proto https;
+		proxy_pass       http://pwiki-direct;
+	}
+	location /w/static/ {
+		proxy_set_header Host              $host;
+		proxy_set_header X-Real-IP         $remote_addr;
+		proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+		proxy_set_header X-Forwarded-Proto https;
+		proxy_pass       http://pwiki-direct;
 	}
 	location /img/ {
-		rewrite ^/img/(.*)$                 /w/images/$1 last;
-	}
-	location = /js.png {
-		rewrite ^/js.png(?:\?(.*))?$        /w/load.php?$1 last;
-	}
-	# Open fonts for inclusion on the Team Fortress Wiki.
-	location ~ \.(eot|ttf|woff|svg)$ {
-		add_header Access-Control-Allow-Origin *;
-	}
-	location ~ pingdom.php$|pingdom.txt$ {
-		return 403;
-	}
-	location ~ \.php$ {
-		if (!-f $document_root$fastcgi_script_name) {
-			return 404;
-		}
-		fastcgi_split_path_info ^((?U).+\.php)(/?.+)$;
-		include /etc/nginx/fastcgi_params;
-		fastcgi_param PATH_INFO $fastcgi_path_info;
-		fastcgi_param PATH_TRANSLATED $document_root$fastcgi_path_info;
-		fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-		fastcgi_param SCRIPT_NAME $fastcgi_script_name;
-		fastcgi_param HTTP_PROXY ""; # https://httpoxy.org/
-		fastcgi_pass  127.0.0.1:3777;
+		proxy_set_header Host              $host;
+		proxy_set_header X-Real-IP         $remote_addr;
+		proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+		proxy_set_header X-Forwarded-Proto https;
+		proxy_pass       http://pwiki-direct;
 	}
 }
 
-# Local server used by pwiki-bot running locally:
+upstream pwiki-firewall {
+  server 127.0.0.1:3888;
+
+  # Fall back to direct access if pwiki-firewall fails.
+  server unix:/run/pwiki/wiki.sock backup;
+}
+
+upstream pwiki-direct {
+  server unix:/run/pwiki/wiki.sock;
+}
+
+# Local server used by pwiki-bot and pwiki-firewall running locally:
 server {
-	listen unix:/run/wiki.sock;
+	listen unix:/run/pwiki/wiki.sock;
 	root  /home/pwiki/www;
 	location / {
 		rewrite ^/+$ /wiki/Main_Page permanent;
@@ -68,6 +94,9 @@ server {
 	location ~ pingdom.php$|pingdom.txt$ {
 		return 403;
 	}
+	location ~ RecentChangesLinked {
+		return 403;
+	}
 	location ~ \.php$ {
 		if (!-f $document_root$fastcgi_script_name) {
 			return 404;
@@ -79,6 +108,7 @@ server {
 		fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
 		fastcgi_param SCRIPT_NAME $fastcgi_script_name;
 		fastcgi_param HTTP_PROXY ""; # https://httpoxy.org/
+		fastcgi_param HTTPS "1";
 
 		# Override this as it is otherwise unset when connecting over a Unix Domain Socket.
 		fastcgi_param REMOTE_ADDR 127.0.0.1;
