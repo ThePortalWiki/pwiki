@@ -73,6 +73,7 @@
     - /home/pwiki/www-private/images
     - /home/pwiki/www/w
     - /home/pwiki/www/w/images
+    - /home/pwiki/www/outer-static
 - name: Create root directories
   ansible.builtin.file:
     state: directory
@@ -144,6 +145,14 @@
     - mediawiki-secrets.php
     - smtp-password
     - botConfig.py
+- name: Clone outer-static files
+  ansible.posix.synchronize:
+    src: "{{ role_path }}/../../../../images/pwiki-app/extra/static/"
+    dest: /home/pwiki/www/outer-static
+    recursive: yes
+    rsync_opts:
+      - "--chown={{ pwiki_uid }}:{{ pwiki_gid }}"
+      - '--delete-after'
 - name: Install gVisor
   ansible.builtin.command:
     argv:
