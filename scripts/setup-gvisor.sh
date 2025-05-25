@@ -56,5 +56,5 @@ done
 if [[ "$redownloaded" == false ]]; then
 	exit 0
 fi
-/usr/bin/runsc install -- --host-uds=all
+/usr/bin/runsc install -- --host-uds=all --platform=systrap --systrap-disable-syscall-patching=true
 systemctl restart docker
