@@ -202,37 +202,37 @@
   when: not dbbackup.stat.exists or not imgbackup.stat.exists
   fail:
     msg: 'Wiki backup not properly restored. Please follow the README.'
-- name: Build pwiki-firewall Docker image
-  community.docker.docker_image:
-    name: pwiki-firewall
-    source: build
-    build:
-      path: /home/pwiki/pwiki/images/pwiki-firewall
-    tag: pwiki-firewall
-  register: firewall_image
-- name: Run pwiki-firewall container
-  community.docker.docker_container:
-    name: pwiki-firewall
-    container_default_behavior: no_defaults
-    state: started
-    recreate: "{{ firewall_image.changed }}"
-    detach: yes
-    init: no
-    interactive: no
-    privileged: no
-    read_only: no
-    runtime: runsc
-    tty: no
-    restart_policy: unless-stopped
-    image: pwiki-firewall:pwiki-firewall
-    volumes:
-      - /run/pwiki:/run/pwiki
-    published_ports:
-      - 127.0.0.1:3888:3888
-    env:
-      COOKIE_DOMAIN: "{{ pwiki_domain }}"
-      REDIRECT_DOMAINS: "{{ pwiki_domain }}"
-      DIFFICULTY: '4'
+#- name: Build pwiki-firewall Docker image
+#  community.docker.docker_image:
+#    name: pwiki-firewall
+#    source: build
+#    build:
+#      path: /home/pwiki/pwiki/images/pwiki-firewall
+#    tag: pwiki-firewall
+#  register: firewall_image
+#- name: Run pwiki-firewall container
+#  community.docker.docker_container:
+#    name: pwiki-firewall
+#    container_default_behavior: no_defaults
+#    state: started
+#    recreate: "{{ firewall_image.changed }}"
+#    detach: yes
+#    init: no
+#    interactive: no
+#    privileged: no
+#    read_only: no
+#    runtime: runsc
+#    tty: no
+#    restart_policy: unless-stopped
+#    image: pwiki-firewall:pwiki-firewall
+#    volumes:
+#      - /run/pwiki:/run/pwiki
+#    published_ports:
+#      - 127.0.0.1:3888:3888
+#    env:
+#      COOKIE_DOMAIN: "{{ pwiki_domain }}"
+#      REDIRECT_DOMAINS: "{{ pwiki_domain }}"
+#      DIFFICULTY: '4'
 - name: Run MediaWiki container
   when: repo.changed or database_container.changed
   ansible.builtin.command:
@@ -273,9 +273,16 @@
     group: root
     mode: '0644'
   loop:
-    - {template: 'nginx.conf.j2', path: '/etc/nginx/nginx.conf'}
-    - {template: 'pwiki.conf.j2', path: "/etc/nginx/conf/{{ pwiki_domain }}.conf"}
-    - {template: 'remove-wiki-sock.conf.j2', path: "/etc/systemd/system/nginx.service.d/remove-wiki-sock.conf"}
+    - template: 'nginx.conf.j2'
+      path: '/etc/nginx/nginx.conf'
+    - template: 'pwiki.conf.j2'
+      path: "/etc/nginx/conf/{{ pwiki_domain }}.conf"
+    - template: 'pwiki-proxy-pass-cheap.inc.j2'
+      path: '/etc/nginx/conf/pwiki-proxy-pass-cheap.inc'
+    - template: 'pwiki-proxy-pass-expensive.inc.j2'
+      path: '/etc/nginx/conf/pwiki-proxy-pass-expensive.inc'
+    - template: 'remove-wiki-sock.conf.j2'
+      path: '/etc/systemd/system/nginx.service.d/remove-wiki-sock.conf'
   register: nginx_configuration
 - name: Set up SSL certificate directories
   ansible.builtin.file:

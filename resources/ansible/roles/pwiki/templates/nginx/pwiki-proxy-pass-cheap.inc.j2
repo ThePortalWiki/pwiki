@@ -1,0 +1,9 @@
+limit_req zone=pwiki_cheap_globally       burst=2048 delay=512;
+limit_req zone=pwiki_cheap_per_ip         burst=256  delay=64;
+limit_req_status 429;
+
+proxy_set_header Host              $host;
+proxy_set_header X-Real-IP         $remote_addr;
+proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+proxy_set_header X-Forwarded-Proto https;
+proxy_pass       http://pwiki-direct;

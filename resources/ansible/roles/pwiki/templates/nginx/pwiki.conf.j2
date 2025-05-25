@@ -1,84 +1,155 @@
+# Expensive URL parameters.
+map $arg_action $expensive_action {
+	default             0;
+	''                  0;
+	history             0;
+	toggle_view_mobile  1;
+	toggle_view_desktop 1;
+	edit                1;
+	feedrecentchanges   0;
+	info                1;
+	query               0;
+	feedcontributions   1;
+	purge               1;
+	protect             1;
+	validatepassword    1;
+	managetags          1;
+	linkaccount         1;
+	watch               0;
+	delete              0;
+	register            0;
+	revisiondelete      1;
+	setpagelanguage     0;
+	~.+                 1;
+}
+map $arg_title $expensive_page {
+	default                       0;
+	Special:RecentChangesLinked   1;
+	Special%3ARecentChangesLinked 1;
+}
+map $arg_oldid $expensive_oldrevision {
+	default 0;
+	''      0;
+	~.+     1;
+}
+map $arg_redlink $expensive_redlink {
+	default 0;
+	''      0;
+	~.+     1;
+}
+map $remote_addr $expensive_limit_per_abusive_ip_key {
+	default              ''; # Not rate-limited.
+	~^20\.171\.207\..*$  20.171.207/24;
+	~^40\.77\.167\..*$   40.77.167.0/24;
+	~^47\.82\.60\..*$    47.82.60.0/24;
+	~^52\.167\.144\..*$  52.167.144.0/24;
+	~^85\.208\.96\..*$   85.208.96.0/24;
+	~^185\.191\.171\..*$ 185.191.171.0/24;
+	~^28f4:d41:a3a4$     28f4:d41:a3a4;
+
+	# Cloudflare; do not add.
+	#~^104\.23\.187\..*$  104.23.187.0/24;
+	#~^104\.23\.190\..*$  104.23.190.0/24;
+}
+
+# Coallese all expensive URL parameters into one.
+map ${expensive_action}/${expensive_page}/${expensive_oldrevision}/${expensive_redlink} $expensive {
+	0/0/0/0 0;
+	default 1;
+}
+
+# Expensive queries get non-empty keys.
+map $expensive $expensive_limit_global_key {
+	0 '';  # Empty string = not rate limited.
+	1 1;   # Global rate limit.
+}
+map $expensive $expensive_limit_per_ip_key {
+	0 '';                   # Empty string = not rate limited.
+	1 $binary_remote_addr;  # Per-IP rate limit.
+}
+
+# Rate limits.
+limit_req_zone $server_name                        zone=pwiki_cheap_globally:1m        rate=256r/s;
+limit_req_zone $binary_remote_addr                 zone=pwiki_cheap_per_ip:32m         rate=128r/s;
+limit_req_zone $expensive_limit_global_key         zone=pwiki_expensive_globally:1m    rate=64r/m;
+limit_req_zone $expensive_limit_per_ip_key         zone=pwiki_expensive_per_ip:32m     rate=8r/m;
+limit_req_zone $expensive_limit_per_abusive_ip_key zone=pwiki_expensive_abusive_ip:32m rate=2r/m;
+
+# Log format with special variables.
+log_format pwiki '$host $remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent" [action=${expensive_action} page=${expensive_page} oldid=${expensive_oldrevision} redlink=${expensive_redlink} abusive=${expensive_limit_per_abusive_ip_key}] [LIMIT: rate=$limit_rate]';
+
+# TLS termination and filtering for rate-limiting.
 server {
 	server_name "{{ pwiki_domain }}";
-	listen 443 ssl;
-	listen [::]:443 ssl;
+	listen      443 ssl;
+	listen      [::]:443 ssl;
 
-	ssl_protocols TLSv1.2;
-	ssl_certificate "/etc/ssl/private/{{ pwiki_domain }}/fullchain.pem";
+	ssl_protocols       TLSv1.2;
+	ssl_certificate     "/etc/ssl/private/{{ pwiki_domain }}/fullchain.pem";
 	ssl_certificate_key "/etc/ssl/private/{{ pwiki_domain }}/privkey.pem";
-	ssl_dhparam "/etc/ssl/private/{{ pwiki_domain }}/tls.dh";
+	ssl_dhparam         "/etc/ssl/private/{{ pwiki_domain }}/tls.dh";
+
+	access_log /var/log/nginx/{{ pwiki_domain }}.access.log pwiki buffer=128k flush=1s;
 
 	add_header Access-Control-Allow-Origin *;
 
-	root  /home/pwiki/www;
+	root /home/pwiki/www;
 	location = /js.png {
-		proxy_set_header Host              $host;
-		proxy_set_header X-Real-IP         $remote_addr;
-		proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
-		proxy_set_header X-Forwarded-Proto https;
-		proxy_pass       http://pwiki-direct;
-	}
-	location = /favicon.ico {
-		proxy_set_header Host              $host;
-		proxy_set_header X-Real-IP         $remote_addr;
-		proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
-		proxy_set_header X-Forwarded-Proto https;
-		proxy_pass       http://pwiki-direct;
+		include /etc/nginx/conf/pwiki-proxy-pass-cheap.inc;
 	}
 	location = /sitemap.xml {
-		proxy_set_header Host              $host;
-		proxy_set_header X-Real-IP         $remote_addr;
-		proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
-		proxy_set_header X-Forwarded-Proto https;
-		proxy_pass       http://pwiki-direct;
-	}
-	location / {
-		proxy_set_header Host              $host;
-		proxy_set_header X-Real-IP         $remote_addr;
-		proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
-		proxy_set_header X-Forwarded-Proto https;
-		proxy_pass       http://pwiki-firewall;
+		include /etc/nginx/conf/pwiki-proxy-pass-cheap.inc;
 	}
 	location /w/images/ {
-		proxy_set_header Host              $host;
-		proxy_set_header X-Real-IP         $remote_addr;
-		proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
-		proxy_set_header X-Forwarded-Proto https;
-		proxy_pass       http://pwiki-direct;
+		include /etc/nginx/conf/pwiki-proxy-pass-cheap.inc;
 	}
 	location /w/static/ {
-		proxy_set_header Host              $host;
-		proxy_set_header X-Real-IP         $remote_addr;
-		proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
-		proxy_set_header X-Forwarded-Proto https;
-		proxy_pass       http://pwiki-direct;
+		include /etc/nginx/conf/pwiki-proxy-pass-cheap.inc;
 	}
 	location /img/ {
-		proxy_set_header Host              $host;
-		proxy_set_header X-Real-IP         $remote_addr;
-		proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
-		proxy_set_header X-Forwarded-Proto https;
-		proxy_pass       http://pwiki-direct;
+		include /etc/nginx/conf/pwiki-proxy-pass-cheap.inc;
+	}
+	location /outer-static/ {
+		# Serve directly.
+	}
+	location = /favicon.png {
+		rewrite /favicon.png /outer-static/favicon.png;
+	}
+	location = /favicon.ico {
+		rewrite /favicon.ico /outer-static/favicon.ico;
+	}
+	location /.within.website/x/cmd/anubis/static/img/ {
+		rewrite ^/.within.website/x/cmd/anubis/static/img/(.*) /outer-static/firewall/$1;
+	}
+	location ~ /wiki/Special:.*$ {
+		include /etc/nginx/conf/pwiki-proxy-pass-expensive.inc;
+	}
+	location / {
+		include /etc/nginx/conf/pwiki-proxy-pass-expensive.inc;
 	}
 }
 
 upstream pwiki-firewall {
-  server 127.0.0.1:3888;
+	server 127.0.0.1:3888;
 
-  # Fall back to direct access if pwiki-firewall fails.
-  server unix:/run/pwiki/wiki.sock backup;
+	# Fall back to direct access if pwiki-firewall fails.
+	server unix:/run/pwiki/wiki.sock backup;
 }
 
 upstream pwiki-direct {
-  server unix:/run/pwiki/wiki.sock;
+	server unix:/run/pwiki/wiki.sock;
 }
 
 # Local server used by pwiki-bot and pwiki-firewall running locally:
 server {
-	listen unix:/run/pwiki/wiki.sock;
-	root  /home/pwiki/www;
+	listen      unix:/run/pwiki/wiki.sock;
+	server_name "{{ pwiki_domain }}";
+	root        /home/pwiki/www;
+	location = / {
+		rewrite ^/+$ https://{{ pwiki_domain }}/wiki/Main_Page permanent;
+	}
 	location / {
-		rewrite ^/+$ /wiki/Main_Page permanent;
+		rewrite ^/+$ https://{{ pwiki_domain }}/wiki/Main_Page permanent;
 		error_page 404 = @mediawiki;
 	}
 	location @mediawiki {
