@@ -161,6 +161,13 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
       'auth' => true
   ];
 
+  # Mark the local container network as trusted "CDN" server.
+  $wgUseCdn = true;
+  $wgUsePrivateIPs = true;
+  $wgCdnServersNoPurge = [];
+  $wgCdnServersNoPurge[] = '127.0.0.1';
+  $wgCdnServersNoPurge[] = 'WILL_BE_REPLACED_BY_CONTAINER_NETWORK_CIDR';
+
   # Load Vector skin. MediaWiki 1.24+ requires manual listing of skins.
   if(function_exists('wfLoadSkin')) {
     # MediaWiki 1.25+
