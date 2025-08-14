@@ -17,6 +17,9 @@ chown -R pwiki:pwiki ~pwiki/www-private
 CONTAINER_SUBNET_CIDR="$(ip addr show eth0 | grep -oP 'inet6? \S+' | cut -d' ' -f2)"
 sed -i "s~WILL_BE_REPLACED_BY_CONTAINER_NETWORK_CIDR~${CONTAINER_SUBNET_CIDR}~g" /home/pwiki/www/w/LocalSettings.php
 
+# Temporary hack for 1.44:
+sed -ri 's~wfDeprecated~# wfDeprecated~i' /home/pwiki/www/w/includes/skins/Skin.php
+
 pushd ~pwiki/www &>/dev/null
 	if [[ -d /patches ]] && [[ "$(ls -1 /patches | grep -P '\.patch$' | wc -l)" -gt 0 ]]; then
 		for patch in /patches/*.patch; do
