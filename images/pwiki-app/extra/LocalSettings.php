@@ -292,6 +292,7 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
   $wgGroupPermissions['sysop']['noratelimit'] = true;
   $wgGroupPermissions['sysop']['unwatchedpages'] = true;
   $wgGroupPermissions['sysop']['ipblock-exempt'] = true;
+  $wgGroupPermissions['sysop']['checkuser'] = true;
   
   $wgGroupPermissions['bureaucrat'] = $wgGroupPermissions['sysop'];
   $wgGroupPermissions['bureaucrat']['userrights'] = true;
@@ -407,3 +408,5 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
   $wgSpamBlacklistFiles = array(
     "$IP/extensions/SpamBlacklist/wikimedia_blacklist"
   );
+
+  if (function_exists('wfLoadExtension')) { wfLoadExtension('CheckUser'); }
