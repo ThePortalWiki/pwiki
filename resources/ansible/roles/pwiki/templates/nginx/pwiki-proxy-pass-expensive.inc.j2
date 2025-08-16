@@ -1,4 +1,4 @@
-limit_req zone=pwiki_expensive_globally   burst=512 delay=64;
+#limit_req zone=pwiki_expensive_globally   burst=512 delay=64;
 limit_req zone=pwiki_expensive_per_ip     burst=64  delay=2;
 limit_req zone=pwiki_expensive_abusive_ip burst=4   delay=4;
 
