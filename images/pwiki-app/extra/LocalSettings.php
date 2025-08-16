@@ -307,7 +307,9 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
   $wgAllowUserCss = true;
 
   # Disable skin selection.
-  $wgHiddenPrefs[] = 'skin';
+  # Edit 2025-08: Actually this is broken by MediaWiki:
+  # https://phabricator.wikimedia.org/T341435
+  # $wgHiddenPrefs[] = 'skin';
 
   # Allow these extra file types for uploads
   $wgFileExtensions = array('png', 'jpg', 'jpeg', 'gif', 'ogg', 'wav', 'txt', 'mp3', 'psd', 'ogv', 'avi', 'flac', 'mpg', 'mp4', 'm4a', 'm4r', 'mkv', 'ttf', 'otf', 'eot', '7z', 'dem', 'cfg', 'diff', 'svg');
