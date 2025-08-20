@@ -2,7 +2,7 @@
 
 set -euxo pipefail
 
-apt-get install -y sudo gnupg2 wget curl libcurl4-openssl-dev libmcrypt-dev libpng-dev libzip-dev libxml2-dev libonig-dev imagemagick psutils procps msmtp ffmpeg iproute2
+apt-get install -y sudo gnupg2 wget curl libcurl4-openssl-dev libmcrypt-dev libpng-dev libzip-dev libxml2-dev libonig-dev imagemagick psutils procps msmtp ffmpeg iproute2 libicu-dev
 
 for ext in curl dom fileinfo gd iconv intl mbstring mysqli session xml zip; do
 	if ! docker-php-ext-install -j"$(nproc)" "$ext"; then

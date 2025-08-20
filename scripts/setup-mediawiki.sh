@@ -149,6 +149,7 @@ run_app() {
 		--detach \
 		--name="$CONTAINER_APP_NAME" \
 		--runtime=runsc \
+		--restart=always \
 		--link="$CONTAINER_DATABASE_NAME:$CONTAINER_DATABASE_NAME" \
 		--volume="$ETC_DIR:/pwiki" \
 		--volume="$SECRETS_DIR:/pwiki-secrets" \
@@ -178,6 +179,11 @@ fi
 # Swap releases.
 docker rm -f "$CONTAINER_APP_NAME" || true
 "$IMAGE_MOUNT" unmount || true
+if [[ -e "$MEDIAWIKI_PRODROOT_BACKUP" ]]; then
+	if ! grep -q "$MEDIAWIKI_PRODROOT_BACKUP" /proc/mounts; then
+		rm -rf --one-file-system "$MEDIAWIKI_PRODROOT_BACKUP"
+	fi
+fi
 mv "$MEDIAWIKI_PRODROOT" "$MEDIAWIKI_PRODROOT_BACKUP"
 mv "$MEDIAWIKI_TESTROOT" "$MEDIAWIKI_PRODROOT"
 "$IMAGE_MOUNT" mount
