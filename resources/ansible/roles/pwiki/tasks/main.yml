@@ -32,6 +32,7 @@
       - cronie
       - docker
       - python-docker
+      - logrotate
   register: packages
 - name: Run Docker
   ansible.builtin.systemd:
@@ -408,3 +409,9 @@
     daemon_reload: "{{ packages.changed }}"
     enabled: yes
     state: "{{ 'restarted' if setup_letsencrypt_cron.changed or setup_backups.changed or setup_bot_cron.changed or setup_reboot_cron.changed or setup_local_healthcheck_cron.changed or setup_remote_healthcheck_cron.changed or setup_regular_maintenance_cron.changed else 'started' }}"
+- name: Start up logrotate
+  ansible.builtin.systemd:
+    name: logrotate.timer
+    daemon_reload: "{{ packages.changed }}"
+    enabled: yes
+    state: started
