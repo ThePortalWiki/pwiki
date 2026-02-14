@@ -48,7 +48,7 @@ cat << EOF > "$PHPFPM_CONFIG"
 [www]
 user = pwiki
 group = pwiki
-listen = 127.0.0.1:9000
+listen = 0.0.0.0:9000
 pm = dynamic
 pm.max_children = 5
 pm.start_servers = 2
