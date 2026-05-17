@@ -22,10 +22,46 @@ map $arg_action $expensive_action {
 	setpagelanguage     0;
 	~.+                 1;
 }
+map $arg_days $expensive_days {
+	default 0;
+	''      0;
+	~.+     1;
+}
+map $arg_diff $expensive_diff {
+	default 0;
+	''      0;
+	~.+     1;
+}
+map $arg_from $expensive_from {
+	default 0;
+	''      0;
+	~.+     1;
+}
+map $arg_returnto $expensive_returnto {
+	default 0;
+	''      0;
+	~.+     1;
+}
+map $arg_offset $expensive_offset {
+	default 0;
+	''      0;
+	~.+     1;
+}
 map $arg_title $expensive_page {
 	default                       0;
+	''                            0;
 	Special:RecentChangesLinked   1;
 	Special%3ARecentChangesLinked 1;
+	Special:RecentChanges         1;
+	Special%3ARecentChanges       1;
+	~Special:WhatLinksHere.*      1;
+	~Special%3AWhatLinksHere.*    1;
+	~Special:PrefixIndex.*        1;
+	~Special%3APrefixIndex.*      1;
+	~Special:Log.*                1;
+	~Special%3ALog%2F.*           1;
+	~Special:ListFiles.*          1;
+	~Special%3AListFiles%2F.*     1;
 }
 map $arg_oldid $expensive_oldrevision {
 	default 0;
@@ -33,6 +69,11 @@ map $arg_oldid $expensive_oldrevision {
 	~.+     1;
 }
 map $arg_redlink $expensive_redlink {
+	default 0;
+	''      0;
+	~.+     1;
+}
+map $cookie_portalwiki_p2__session $is_logged_in {
 	default 0;
 	''      0;
 	~.+     1;
@@ -52,10 +93,10 @@ map $remote_addr $expensive_limit_per_abusive_ip_key {
 	#~^104\.23\.190\..*$  104.23.190.0/24;
 }
 
-# Coallese all expensive URL parameters into one.
-map ${expensive_action}/${expensive_page}/${expensive_oldrevision}/${expensive_redlink} $expensive {
-	0/0/0/0 0;
-	default 1;
+# Coalesce all expensive URL parameters into one.
+map ${expensive_action}/${expensive_days}/${expensive_diff}/${expensive_from}/${expensive_returnto}/${expensive_offset}/${expensive_page}/${expensive_oldrevision}/${expensive_redlink} $expensive {
+	0/0/0/0/0/0/0/0/0 0;
+	default           1;
 }
 
 # Expensive queries get non-empty keys.
@@ -67,16 +108,23 @@ map $expensive $expensive_limit_per_ip_key {
 	0 '';                   # Empty string = not rate limited.
 	1 $binary_remote_addr;  # Per-IP rate limit.
 }
+map ${expensive}/${is_logged_in} $expensive_logged_out_global_key {
+	0/0 '';  # Not expensive, logged out = not rate limited.
+	1/0 1;   # Expensive, logged out = rate limited.
+	0/1 '';  # Not expensive, logged in = not rate limited.
+	1/1 '';  # Expensive, logged in = not rate limited.
+}
 
 # Rate limits.
-limit_req_zone $server_name                        zone=pwiki_cheap_globally:1m        rate=256r/s;
-limit_req_zone $binary_remote_addr                 zone=pwiki_cheap_per_ip:32m         rate=128r/s;
-limit_req_zone $expensive_limit_global_key         zone=pwiki_expensive_globally:1m    rate=64r/m;
-limit_req_zone $expensive_limit_per_ip_key         zone=pwiki_expensive_per_ip:32m     rate=8r/m;
-limit_req_zone $expensive_limit_per_abusive_ip_key zone=pwiki_expensive_abusive_ip:32m rate=2r/m;
+limit_req_zone $server_name                        zone=pwiki_cheap_globally:1m                 rate=256r/s;
+limit_req_zone $binary_remote_addr                 zone=pwiki_cheap_per_ip:32m                  rate=128r/s;
+limit_req_zone $expensive_limit_global_key         zone=pwiki_expensive_globally:1m             rate=64r/m;
+limit_req_zone $expensive_limit_per_ip_key         zone=pwiki_expensive_per_ip:32m              rate=8r/m;
+limit_req_zone $expensive_limit_per_abusive_ip_key zone=pwiki_expensive_abusive_ip:32m          rate=2r/m;
+limit_req_zone $expensive_logged_out_global_key    zone=pwiki_expensive_logged_out_globally:1m  rate=1r/m;
 
 # Log format with special variables.
-log_format pwiki '$host $remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent" [action=${expensive_action} page=${expensive_page} oldid=${expensive_oldrevision} redlink=${expensive_redlink} abusive=${expensive_limit_per_abusive_ip_key}] [LIMIT: rate=$limit_rate]';
+log_format pwiki '$host $remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent" [logged_in=${is_logged_in} expensive=${expensive} abusive=${expensive_limit_per_abusive_ip_key}] [LIMIT: rate=$limit_rate]';
 
 # TLS termination and filtering for rate-limiting.
 server {
