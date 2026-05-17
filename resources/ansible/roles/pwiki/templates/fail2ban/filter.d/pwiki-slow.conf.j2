@@ -1,0 +1,7 @@
+[Definition]
+
+# Block IPs that send more than maxretry requests with upstream response time >= 5 seconds
+# (is_slow=1) within the findtime window.
+failregex = ^<HOST> status=\d+ is_slow=1 \S+ \S+
+
+ignoreregex =

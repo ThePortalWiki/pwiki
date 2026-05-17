@@ -1,0 +1,7 @@
+[Definition]
+
+# Block IPs that send more than maxretry requests resulting in HTTP 499 (client canceled)
+# within the findtime window.
+failregex = ^<HOST> status=499 is_slow=\d+ \S+ \S+
+
+ignoreregex =

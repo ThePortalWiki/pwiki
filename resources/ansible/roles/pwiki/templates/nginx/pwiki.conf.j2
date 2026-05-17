@@ -94,6 +94,13 @@ map $remote_addr $expensive_limit_per_abusive_ip_key {
 }
 
 # Coalesce all expensive URL parameters into one.
+
+# Map upstream_response_time to is_slow (1 if >= 5 seconds, 0 otherwise).
+map $upstream_response_time $is_slow {
+	default        0;
+	~^[5-9]        1;
+	~^[1-9][0-9]   1;
+}
 map ${expensive_action}/${expensive_days}/${expensive_diff}/${expensive_from}/${expensive_returnto}/${expensive_offset}/${expensive_page}/${expensive_oldrevision}/${expensive_redlink} $expensive {
 	0/0/0/0/0/0/0/0/0 0;
 	default           1;
@@ -114,6 +121,12 @@ map ${expensive}/${is_logged_in} $expensive_logged_out_global_key {
 	0/1 '';  # Not expensive, logged in = not rate limited.
 	1/1 '';  # Expensive, logged in = not rate limited.
 }
+map ${expensive}/${is_logged_in} $expensive_logged_out_per_ip_key {
+	0/0 '';                    # Not expensive, logged out = not rate limited.
+	1/0 $binary_remote_addr;   # Expensive, logged out = rate limited.
+	0/1 '';                    # Not expensive, logged in = not rate limited.
+	1/1 '';                    # Expensive, logged in = not rate limited.
+}
 
 # Rate limits.
 limit_req_zone $server_name                        zone=pwiki_cheap_globally:1m                 rate=256r/s;
@@ -121,10 +134,14 @@ limit_req_zone $binary_remote_addr                 zone=pwiki_cheap_per_ip:32m  
 limit_req_zone $expensive_limit_global_key         zone=pwiki_expensive_globally:1m             rate=64r/m;
 limit_req_zone $expensive_limit_per_ip_key         zone=pwiki_expensive_per_ip:32m              rate=8r/m;
 limit_req_zone $expensive_limit_per_abusive_ip_key zone=pwiki_expensive_abusive_ip:32m          rate=2r/m;
-limit_req_zone $expensive_logged_out_global_key    zone=pwiki_expensive_logged_out_globally:1m  rate=1r/m;
+limit_req_zone $expensive_logged_out_global_key    zone=pwiki_expensive_logged_out_globally:1m  rate=32r/m;
+limit_req_zone $expensive_logged_out_per_ip_key    zone=pwiki_expensive_logged_out_per_ip:32m   rate=1r/m;
 
 # Log format with special variables.
 log_format pwiki '$host $remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent" [logged_in=${is_logged_in} expensive=${expensive} abusive=${expensive_limit_per_abusive_ip_key}] [LIMIT: rate=$limit_rate]';
+
+# Fail2ban log format for rate-limiting enforcement.
+log_format pwiki_fail2ban '$remote_addr status=$status is_slow=${is_slow} $request_method $uri';
 
 # TLS termination and filtering for rate-limiting.
 server {
@@ -137,7 +154,8 @@ server {
 	ssl_certificate_key "/etc/ssl/private/{{ pwiki_domain }}/privkey.pem";
 	ssl_dhparam         "/etc/ssl/private/{{ pwiki_domain }}/tls.dh";
 
-	access_log /var/log/nginx/{{ pwiki_domain }}.access.log pwiki buffer=128k flush=1s;
+	access_log /var/log/nginx/{{ pwiki_domain }}.access.log   pwiki          buffer=128k flush=1s;
+	access_log /var/log/nginx/{{ pwiki_domain }}.fail2ban.log pwiki_fail2ban buffer=128k flush=1s;
 
 	add_header Access-Control-Allow-Origin *;
 

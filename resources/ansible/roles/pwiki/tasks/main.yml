@@ -33,6 +33,7 @@
       - docker
       - python-docker
       - logrotate
+      - fail2ban
   register: packages
 - name: Run Docker
   ansible.builtin.systemd:
@@ -338,6 +339,42 @@
     daemon_reload: "{{ packages.changed }}"
     enabled: yes
     state: "{{ 'restarted' if packages.changed or nginx_configuration.changed or letsencrypt_initial.changed or diffie_hellman_group.changed else 'started' }}"
+- name: Set up fail2ban configuration directories
+  ansible.builtin.file:
+    state: directory
+    dest: "{{ item }}"
+    owner: root
+    group: root
+    mode: '0755'
+  loop:
+    - /etc/fail2ban
+    - /etc/fail2ban/filter.d
+    - /etc/fail2ban/jail.d
+- name: Set up fail2ban filters
+  ansible.builtin.template:
+    src: "{{ role_path }}/templates/fail2ban/filter.d/{{ item }}.conf.j2"
+    dest: "/etc/fail2ban/filter.d/{{ item }}.conf"
+    owner: root
+    group: root
+    mode: '0644'
+  loop:
+    - pwiki-499
+    - pwiki-slow
+  register: fail2ban_filters
+- name: Set up fail2ban jails
+  ansible.builtin.template:
+    src: "{{ role_path }}/templates/fail2ban/jail.d/pwiki.conf.j2"
+    dest: "/etc/fail2ban/jail.d/pwiki.conf"
+    owner: root
+    group: root
+    mode: '0644'
+  register: fail2ban_jails
+- name: Enable fail2ban
+  ansible.builtin.systemd:
+    name: fail2ban.service
+    daemon_reload: "{{ packages.changed }}"
+    enabled: yes
+    state: "{{ 'restarted' if packages.changed or fail2ban_filters.changed or fail2ban_jails.changed else 'started' }}"
 - name: Set up backups
   when: repo.changed
   ansible.builtin.command:
