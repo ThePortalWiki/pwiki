@@ -55,6 +55,7 @@ map $arg_title $expensive_page {
 	Special:RecentChanges         1;
 	Special%3ARecentChanges       1;
 	Special:UserLogin             0;
+	Special:UserLogout            0;
 	Special:PasswordReset         0;
 	Special:CreateAccount         0;
 	~Special:WhatLinksHere.*      1;
@@ -69,6 +70,7 @@ map $arg_title $expensive_page {
 map $arg_title $is_required_for_logging_in {
 	default                 0;
 	'Special:UserLogin'     1;
+	'Special:UserLogout'    1;
 	'Special:PasswordReset' 1;
 	'Special:CreateAccount' 1;
 }
