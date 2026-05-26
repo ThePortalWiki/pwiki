@@ -23,12 +23,12 @@ checkDomainMainPage() {
 
 if [[ "$mode" == '--local' ]]; then
 	localSuccess=false
-	for i in $(seq 1 10); do
+	for i in $(seq 1 20); do
 		if checkLocalMainPage &>/dev/null; then
 			localSuccess=true
 			break
 		fi
-		sleep 30
+		sleep 60
 	done
 	if [[ "$localSuccess" == false ]]; then
 		echo 'Local health check failed, rebooting in 10 seconds.' >&2
@@ -38,7 +38,7 @@ if [[ "$mode" == '--local' ]]; then
 	fi
 else
 	remoteSuccess=false
-	for i in $(seq 1 10); do
+	for i in $(seq 1 20); do
 		if checkDomainMainPage &>/dev/null; then
 			remoteSuccess=true
 			break

@@ -3,5 +3,6 @@ limit_req zone=pwiki_expensive_per_ip               burst=64  delay=2;
 limit_req zone=pwiki_expensive_abusive_ip           burst=4   delay=4;
 #limit_req zone=pwiki_expensive_logged_out_globally burst=256 delay=64;
 limit_req zone=pwiki_expensive_logged_out_per_ip    burst=4   delay=2;
+limit_req zone=pwiki_block_unauthenticated          nodelay;
 
 include /etc/nginx/conf/pwiki-proxy-pass-cheap.inc;

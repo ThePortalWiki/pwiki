@@ -360,6 +360,7 @@
   loop:
     - pwiki-499
     - pwiki-slow
+    - pwiki-499-and-slow
   register: fail2ban_filters
 - name: Set up fail2ban jails
   ansible.builtin.template:
@@ -375,6 +376,62 @@
     daemon_reload: "{{ packages.changed }}"
     enabled: yes
     state: "{{ 'restarted' if packages.changed or fail2ban_filters.changed or fail2ban_jails.changed else 'started' }}"
+- name: Enable iptables service
+  ansible.builtin.systemd:
+    name: iptables.service
+    daemon_reload: "{{ packages.changed }}"
+    enabled: yes
+    state: started
+- name: Create iptables rules directory
+  ansible.builtin.file:
+    state: directory
+    path: /etc/iptables
+    owner: root
+    group: root
+    mode: '0755'
+- name: Create iptables auto-expiry snapshot directory
+  ansible.builtin.file:
+    state: directory
+    path: /var/log/iptables-autoexpiry
+    owner: root
+    group: root
+    mode: '0755'
+- name: Set up iptables-restore-fail2ban service
+  ansible.builtin.template:
+    src: "{{ role_path }}/templates/iptables-restore-fail2ban.service.j2"
+    dest: /etc/systemd/system/iptables-restore-fail2ban.service
+    owner: root
+    group: root
+    mode: '0644'
+  register: iptables_restore_fail2ban_service
+- name: Enable iptables-restore-fail2ban service
+  ansible.builtin.systemd:
+    name: iptables-restore-fail2ban.service
+    daemon_reload: "{{ iptables_restore_fail2ban_service.changed }}"
+    enabled: yes
+    state: started
+- name: Set up iptables-autoexpiry service
+  ansible.builtin.template:
+    src: "{{ role_path }}/templates/iptables-autoexpiry.service.j2"
+    dest: /etc/systemd/system/iptables-autoexpiry.service
+    owner: root
+    group: root
+    mode: '0644'
+  register: iptables_autoexpiry_service
+- name: Set up iptables-autoexpiry timer
+  ansible.builtin.template:
+    src: "{{ role_path }}/templates/iptables-autoexpiry.timer.j2"
+    dest: /etc/systemd/system/iptables-autoexpiry.timer
+    owner: root
+    group: root
+    mode: '0644'
+  register: iptables_autoexpiry_timer
+- name: Enable iptables-autoexpiry timer
+  ansible.builtin.systemd:
+    name: iptables-autoexpiry.timer
+    daemon_reload: "{{ iptables_restore_fail2ban_service.changed or iptables_autoexpiry_service.changed or iptables_autoexpiry_timer.changed }}"
+    enabled: yes
+    state: started
 - name: Set up backups
   when: repo.changed
   ansible.builtin.command:

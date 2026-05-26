@@ -1,0 +1,7 @@
+[Unit]
+Description=Auto-expiry for fail2ban IP bans based on iptables snapshots
+After=iptables-restore-fail2ban.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /home/pwiki/pwiki/scripts/iptables-autoexpiry.py

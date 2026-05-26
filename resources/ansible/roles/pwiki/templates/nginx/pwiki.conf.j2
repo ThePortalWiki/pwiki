@@ -54,6 +54,9 @@ map $arg_title $expensive_page {
 	Special%3ARecentChangesLinked 1;
 	Special:RecentChanges         1;
 	Special%3ARecentChanges       1;
+	Special:UserLogin             0;
+	Special:PasswordReset         0;
+	Special:CreateAccount         0;
 	~Special:WhatLinksHere.*      1;
 	~Special%3AWhatLinksHere.*    1;
 	~Special:PrefixIndex.*        1;
@@ -62,6 +65,12 @@ map $arg_title $expensive_page {
 	~Special%3ALog%2F.*           1;
 	~Special:ListFiles.*          1;
 	~Special%3AListFiles%2F.*     1;
+}
+map $arg_title $is_required_for_logging_in {
+	default                 0;
+	'Special:UserLogin'     1;
+	'Special:PasswordReset' 1;
+	'Special:CreateAccount' 1;
 }
 map $arg_oldid $expensive_oldrevision {
 	default 0;
@@ -101,9 +110,13 @@ map $upstream_response_time $is_slow {
 	~^[5-9]        1;
 	~^[1-9][0-9]   1;
 }
-map ${expensive_action}/${expensive_days}/${expensive_diff}/${expensive_from}/${expensive_returnto}/${expensive_offset}/${expensive_page}/${expensive_oldrevision}/${expensive_redlink} $expensive {
+map ${expensive_action}/${expensive_days}/${expensive_diff}/${expensive_from}/${expensive_returnto}/${expensive_offset}/${expensive_page}/${expensive_oldrevision}/${expensive_redlink} $expensive_pre {
 	0/0/0/0/0/0/0/0/0 0;
 	default           1;
+}
+map ${expensive_pre}/${is_required_for_logging_in} $expensive {
+	1/0 1;
+	default 0;
 }
 
 # Expensive queries get non-empty keys.
@@ -128,20 +141,27 @@ map ${expensive}/${is_logged_in} $expensive_logged_out_per_ip_key {
 	1/1 '';                    # Expensive, logged in = not rate limited.
 }
 
+# Block expensive queries for unauthenticated users.
+map ${expensive}/${is_logged_in}/${is_required_for_logging_in} $block_unauthenticated_expensive_key {
+	default  '';
+	1/0/0    'INSTABLOCK';
+}
+
 # Rate limits.
-limit_req_zone $server_name                        zone=pwiki_cheap_globally:1m                 rate=256r/s;
-limit_req_zone $binary_remote_addr                 zone=pwiki_cheap_per_ip:32m                  rate=128r/s;
-limit_req_zone $expensive_limit_global_key         zone=pwiki_expensive_globally:1m             rate=64r/m;
-limit_req_zone $expensive_limit_per_ip_key         zone=pwiki_expensive_per_ip:32m              rate=8r/m;
-limit_req_zone $expensive_limit_per_abusive_ip_key zone=pwiki_expensive_abusive_ip:32m          rate=2r/m;
-limit_req_zone $expensive_logged_out_global_key    zone=pwiki_expensive_logged_out_globally:1m  rate=32r/m;
-limit_req_zone $expensive_logged_out_per_ip_key    zone=pwiki_expensive_logged_out_per_ip:32m   rate=1r/m;
+limit_req_zone $server_name                         zone=pwiki_cheap_globally:1m                 rate=256r/s;
+limit_req_zone $binary_remote_addr                  zone=pwiki_cheap_per_ip:32m                  rate=128r/s;
+limit_req_zone $expensive_limit_global_key          zone=pwiki_expensive_globally:1m             rate=64r/m;
+limit_req_zone $expensive_limit_per_ip_key          zone=pwiki_expensive_per_ip:32m              rate=8r/m;
+limit_req_zone $expensive_limit_per_abusive_ip_key  zone=pwiki_expensive_abusive_ip:32m          rate=2r/m;
+limit_req_zone $expensive_logged_out_global_key     zone=pwiki_expensive_logged_out_globally:1m  rate=32r/m;
+limit_req_zone $expensive_logged_out_per_ip_key     zone=pwiki_expensive_logged_out_per_ip:32m   rate=1r/m;
+limit_req_zone $block_unauthenticated_expensive_key zone=pwiki_block_unauthenticated:1m          rate=1r/m;
 
 # Log format with special variables.
 log_format pwiki '$host $remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent" [logged_in=${is_logged_in} expensive=${expensive} abusive=${expensive_limit_per_abusive_ip_key}] [LIMIT: rate=$limit_rate]';
 
 # Fail2ban log format for rate-limiting enforcement.
-log_format pwiki_fail2ban '$remote_addr status=$status is_slow=${is_slow} $request_method $uri';
+log_format pwiki_fail2ban '$remote_addr status=$status is_slow=${is_slow} expensive=${expensive} is_logged_in=${is_logged_in} is_required_for_logging_in=${is_required_for_logging_in} status=$status $request';
 
 # TLS termination and filtering for rate-limiting.
 server {

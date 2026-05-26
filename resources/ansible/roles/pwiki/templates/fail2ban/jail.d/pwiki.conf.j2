@@ -1,17 +1,26 @@
+[pwiki-499-and-slow]
+enabled = true
+port = https,http
+filter = pwiki-499-and-slow
+logpath = /var/log/nginx/{{ pwiki_domain }}.fail2ban.log
+maxretry = 0
+findtime = 300
+bantime = 345600
+
 [pwiki-499]
 enabled = true
 port = https,http
 filter = pwiki-499
 logpath = /var/log/nginx/{{ pwiki_domain }}.fail2ban.log
-maxretry = 3
+maxretry = 1
 findtime = 3600
-bantime = 21600
+bantime = 86400
 
 [pwiki-slow]
 enabled = true
 port = https,http
 filter = pwiki-slow
 logpath = /var/log/nginx/{{ pwiki_domain }}.fail2ban.log
-maxretry = 3
+maxretry = 2
 findtime = 300
-bantime = 21600
+bantime = 43200

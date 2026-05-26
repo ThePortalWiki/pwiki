@@ -1,0 +1,11 @@
+[Unit]
+Description=Restore fail2ban iptables rules from latest snapshot after reboot
+Requires=fail2ban.service
+After=fail2ban.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /home/pwiki/pwiki/scripts/iptables-restore-fail2ban.py
+
+[Install]
+WantedBy=multi-user.target
