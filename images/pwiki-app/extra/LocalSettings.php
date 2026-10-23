@@ -326,6 +326,11 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
   $wgVectorFeatures['collapsiblenav']['global'] = false;
   $wgVectorFeatures['collapsiblenav']['user'] = true;
 
+  # Citizen skin features.
+  # https://github.com/StarCitizenTools/mediawiki-skins-Citizen/blob/a34efc552dd5c2c8a327d5cebbfdc1e46ddaadcd/docs/src/config/index.md
+  $wgCitizenThemeDefault = 'light';
+  $wgCitizenShowPageTools = 'login';
+  $wgCitizenThemeColor = '#a7d7f9';
 
   # Extra footer links
   #$wgHooks['SkinTemplateOutputPageBeforeExec'][] = '_footer_onionlink';
