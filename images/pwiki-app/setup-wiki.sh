@@ -4,7 +4,7 @@ set -euxo pipefail
 
 apt-get install -y sudo gnupg2 wget curl libcurl4-openssl-dev libmcrypt-dev libpng-dev libzip-dev libxml2-dev libonig-dev imagemagick psutils procps msmtp ffmpeg iproute2 libicu-dev
 
-for ext in curl dom fileinfo gd iconv intl mbstring mysqli session xml zip; do
+for ext in curl fileinfo gd iconv intl mbstring mysqli session xml zip; do
 	if ! docker-php-ext-install -j"$(nproc)" "$ext"; then
 		echo "Failed to install extension: $ext" >&2
 		exit 1
@@ -14,7 +14,7 @@ pear install mail
 pear install net_smtp
 
 # Get the latest APCu version number from https://pecl.php.net/package/APCU
-pecl install -f apcu-5.1.22 </dev/null
+pecl install -f apcu </dev/null
 docker-php-ext-enable apcu --ini-name 10-docker-php-ext-apcu.ini
 
 # PHP settings

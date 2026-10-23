@@ -398,10 +398,6 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
 
   if (function_exists('wfLoadExtension')) { wfLoadExtension('CharInsert'); } else { require_once( "$IP/extensions/CharInsert/CharInsert.php" ); }
 
-  if (function_exists('wfLoadExtension')) { wfLoadExtension('Interwiki'); } else { require_once( "$IP/extensions/Interwiki/Interwiki.php" ); }
-  $wgGroupPermissions['*']['interwiki'] = false;
-  $wgGroupPermissions['sysop']['interwiki'] = true;
-
   # No patch exists for current MediaWiki; update please?
   # https://github.com/ThePortalWiki/RevQuery
   # if (function_exists('wfLoadExtension')) { wfLoadExtension('RevQuery'); } else { require_once( "$IP/extensions/RevQuery/RevQuery.php" ); }
